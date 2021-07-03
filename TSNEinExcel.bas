@@ -19,16 +19,17 @@ Function TSNE(XasRange As Range, DesiredPerplexity As Double, numberOfIterations
     'pj|i=exp(-||xi-xj||^2/2Sigma^2)/Sum(exp(-||xi-xk||^2/2Sigma^2))
     'Perp(Pi)=2^H(Pi)
     'H(Pi)=-Sum(pj|i)*log2(pj|i)
-    ReDim p(1 To numberOfSamplesInX, 1 To numberOfSamplesInX)
     p = SearchMeForFixedPerpexity(x, numberOfSamplesInX, numberOfDimentions, DesiredPerplexity)
     'Set pij= ( pj|i + pi|j ) / 2 * n
     ReDim y(1 To numberOfSamplesInX, 1 To numberOfDimentionsInLowDimensionalSpace)
     ReDim oldy(1 To numberOfSamplesInX, 1 To numberOfDimentionsInLowDimensionalSpace)
-    For i = 2 To numberOfSamplesInX
-        For j = 1 To i - 1
-            p(i, j) = p(i, j) / numberOfSamplesInX
+    For i = 1 To numberOfSamplesInX - 1
+        For j = i + 1 To numberOfSamplesInX
+            p(i)(j) = p(i)(j) / numberOfSamplesInX
             ''p(i, j) = (p(i, j) + p(j, i)) / (2 * numberOfSamplesInX)
         Next j
+    Next i
+    For i = 1 To numberOfSamplesInX
         ''Sample Initial Solution Y
         For j = 1 To numberOfDimentionsInLowDimensionalSpace
             y(i, j) = Rnd()
@@ -44,7 +45,7 @@ Function TSNE(XasRange As Range, DesiredPerplexity As Double, numberOfIterations
     'end
     '''
     Dim q() As Variant 'qji
-    ReDim q(1 To numberOfSamplesInX, 1 To numberOfSamplesInX)
+    q = GenerateHalfAMatrix(numberOfSamplesInX)
     Dim Sumq As Double
     Dim dCdYi() As Variant
     ReDim dCdYi(1 To numberOfSamplesInX, 1 To numberOfDimentionsInLowDimensionalSpace)
@@ -54,17 +55,16 @@ Function TSNE(XasRange As Range, DesiredPerplexity As Double, numberOfIterations
 End Function
 Private Function getMeThePairWiseAffinities1(x() As Variant, numberOfSamplesInX As Long, numberOfDimentions As Long)
     'This is the part of the code that is independant of minusTwoSigmaSquared.
-    'I can play this part of the code only once during the sogma search
+    'I can play this part of the code only once during the sigma search
     Dim i As Long 'These are only going to help in the for loops
     Dim j As Long 'These are only going to help in the for loops
     Dim n As Long 'These are only going to help in the for loops
     Dim p() As Variant 'pj|i
-    ReDim p(1 To numberOfSamplesInX, 1 To numberOfSamplesInX)
-    For i = 2 To numberOfSamplesInX
-        For j = 1 To i - 1
+    p = GenerateHalfAMatrix(numberOfSamplesInX)
+    For i = 1 To numberOfSamplesInX - 1
+        For j = i + 1 To numberOfSamplesInX
             For n = 1 To numberOfDimentions
-                p(i, j) = p(i, j) + (x(i, n) - x(j, n)) ^ 2
-                'p(j, i) = p(i, j)
+                p(i)(j) = p(i)(j) + (x(i, n) - x(j, n)) ^ 2
             Next n
         Next j
     Next i
@@ -75,25 +75,25 @@ Private Function getMeThePairWiseAffinities2(aux() As Variant, numberOfSamplesIn
     Dim i As Long 'These are only going to help in the for loops
     Dim j As Long 'These are only going to help in the for loops
     Dim p() As Variant
-    ReDim p(1 To numberOfSamplesInX, 1 To numberOfSamplesInX)
+    p = GenerateHalfAMatrix(numberOfSamplesInX)
     Dim sumOfPairWiseAffinities() As Variant
     ReDim sumOfPairWiseAffinities(1 To numberOfSamplesInX)
-    For i = 2 To numberOfSamplesInX
-        For j = 1 To i - 1
-            p(i, j) = Exp((aux(i, j)) / minusTwoSigmaSquared(j))
+    For i = 1 To numberOfSamplesInX - 1
+        For j = 1 + i To numberOfSamplesInX
+            p(i)(j) = Exp((aux(i)(j)) / minusTwoSigmaSquared(i))
             'p(j, i) = Exp((p(i, j)) / minusTwoSigmaSquared(i))
         Next j
     Next i
-    For i = 2 To numberOfSamplesInX
-        For j = 1 To i - 1
-            sumOfPairWiseAffinities(i) = sumOfPairWiseAffinities(i) + p(i, j)
-            sumOfPairWiseAffinities(j) = sumOfPairWiseAffinities(j) + p(i, j)
+    For i = 1 To numberOfSamplesInX - 1
+        For j = 1 + i To numberOfSamplesInX
+            sumOfPairWiseAffinities(i) = sumOfPairWiseAffinities(i) + p(i)(j)
+            sumOfPairWiseAffinities(j) = sumOfPairWiseAffinities(j) + p(i)(j)
         Next j
     Next i
     '' get the normilized pair wise affinities
-    For i = 2 To numberOfSamplesInX
-        For j = 1 To i - 1
-            p(i, j) = p(i, j) / (sumOfPairWiseAffinities(i) + 0.000001)
+    For i = 1 To numberOfSamplesInX - 1
+        For j = 1 + i To numberOfSamplesInX
+            p(i)(j) = p(i)(j) / (sumOfPairWiseAffinities(j) + 0.000001)
             'p(j, i) = p(i, j) 'p(i, j) / (sumOfPairWiseAffinities(i) + 0.000001)
         Next j
     Next i
@@ -152,64 +152,66 @@ Private Function SearchMeForFixedPerpexity(x() As Variant, numberOfSamplesInX As
     SearchMeForFixedPerpexity = p
 End Function
 Private Function GetMeThePerplexity(p() As Variant, numberOfSamplesInX As Long) As Variant
-Dim Perplexities() As Variant
-ReDim Perplexities(1 To numberOfSamplesInX)
-Dim i As Long 'These are only going to help in the for loops
-Dim j As Long 'These are only going to help in the for loops
-Dim aux As Double
-For i = 2 To numberOfSamplesInX
-    For j = 1 To i - 1
-        aux = p(i, j) * WorksheetFunction.Log(p(i, j) + 0.0001, 2)
-        Perplexities(i) = Perplexities(i) + aux
-        Perplexities(j) = Perplexities(j) + aux
-        'Perplexities(j) = Perplexities(j) + p(j, i) * Log(p(j, i) + 0.001)
-    Next j
-Next i
-For i = 1 To numberOfSamplesInX
-    Perplexities(i) = 2 ^ (-Perplexities(i)) 'A correction cause i've used log 10  * 1.44269504088896
-Next i
-GetMeThePerplexity = Perplexities
+    Dim Perplexities() As Variant
+    ReDim Perplexities(1 To numberOfSamplesInX)
+    Dim i As Long 'These are only going to help in the for loops
+    Dim j As Long 'These are only going to help in the for loops
+    Dim aux As Double
+    For i = 1 To numberOfSamplesInX - 1
+        For j = 1 + i To numberOfSamplesInX
+            aux = p(i)(j) * WorksheetFunction.Log(p(i)(j) + 0.0001, 2)
+            Perplexities(i) = Perplexities(i) + aux
+            Perplexities(j) = Perplexities(j) + aux
+            'Perplexities(j) = Perplexities(j) + p(j, i) * Log(p(j, i) + 0.001)
+        Next j
+    Next i
+    For i = 1 To numberOfSamplesInX
+        Perplexities(i) = 2 ^ (-Perplexities(i))
+    Next i
+    GetMeThePerplexity = Perplexities
 End Function
 Private Sub YUpload(ByRef p() As Variant, ByRef q() As Variant, ByRef Sumq As Variant, ByRef y() As Variant, ByRef oldy() As Variant, ByRef dCdYi() As Variant, ByRef numberOfSamplesInX As Long, ByRef numberOfDimentionsInLowDimensionalSpace As Integer, ByRef numberOfIterations As Long, ByRef momentum As Double)
     Dim aux() As Variant
+    Dim aux1 As Double
     Dim i As Long
     Dim j As Long
     Dim iter As Long
     Dim n As Integer
     For iter = 1 To numberOfIterations
-        For i = 2 To numberOfSamplesInX
-            For j = 1 To i - 1
+        For i = 1 To numberOfSamplesInX - 1
+            For j = 1 + i To numberOfSamplesInX
                 For n = 1 To numberOfDimentionsInLowDimensionalSpace
-                    q(i, j) = q(i, j) + (y(i, n) - y(j, n)) ^ 2
+                    q(i)(j) = q(i)(j) + (y(i, n) - y(j, n)) ^ 2
 '                   q(j, i) = q(j, i) + (y(j, n) - y(i, n)) ^ 2
                 Next n
             Next j
         Next i
-        ReDim aux(1 To numberOfSamplesInX, 1 To numberOfSamplesInX, 1 To numberOfDimentionsInLowDimensionalSpace)
-        For i = 2 To numberOfSamplesInX
-            For j = 1 To i - 1
-                q(i, j) = (1 + q(i, j)) ^ -1
+        aux = GenerateHalfAPrism(numberOfSamplesInX, numberOfDimentionsInLowDimensionalSpace)
+        For i = 1 To numberOfSamplesInX - 1
+            For j = 1 + i To numberOfSamplesInX
+                q(i)(j) = (1 + q(i)(j)) ^ -1
 '               q(j, i) = (1 + q(j, i)) ^ -1
                 For n = 1 To numberOfDimentionsInLowDimensionalSpace
-                    aux(i, j, n) = q(i, j)
+                    aux(i)(j)(n) = q(i)(j)
                     'aux(j, i, n) = q(i, j)
 '                   aux(j, i, n) = q(j, i)
                 Next n
-                Sumq = Sumq + 2 * q(i, j) ' + q(i, j)
+                Sumq = Sumq + 2 * q(i)(j) ' + q(i, j)
             Next j
         Next i
-        For i = 2 To numberOfSamplesInX
-            For j = 1 To i - 1
-                q(i, j) = q(i, j) / Sumq
+        For i = 1 To numberOfSamplesInX - 1
+            For j = 1 + i To numberOfSamplesInX
+                q(i)(j) = q(i)(j) / Sumq
 '               q(j, i) = q(j, i) / Sumq
             Next j
         Next i
         ''Gradient Calculation (Check if keeping this array in the memory is avoidable)
-        For i = 2 To numberOfSamplesInX
-            For j = 1 To i - 1
+        For i = 1 To numberOfSamplesInX - 1
+            For j = 1 + i To numberOfSamplesInX
                 For n = 1 To numberOfDimentionsInLowDimensionalSpace
-                    dCdYi(i, n) = dCdYi(i, n) + aux(i, j, n) * (y(i, n) - y(j, n)) * (p(i, j) - q(i, j))
-                    dCdYi(j, n) = dCdYi(j, n) + aux(i, j, n) * (y(j, n) - y(i, n)) * (p(i, j) - q(i, j))
+                    aux1 = (p(i)(j) - q(i)(j)) * aux(i)(j)(n) * (y(i, n) - y(j, n))
+                    dCdYi(i, n) = dCdYi(i, n) + aux1
+                    dCdYi(j, n) = dCdYi(j, n) - aux1
                 Next n
             Next j
         Next i
@@ -218,10 +220,46 @@ Private Sub YUpload(ByRef p() As Variant, ByRef q() As Variant, ByRef Sumq As Va
         ''ReDim aux(1 To numberOfSamplesInX, 1 To numberOfDimentionsInLowDimensionalSpace)
         For i = 1 To numberOfSamplesInX
             For n = 1 To numberOfDimentionsInLowDimensionalSpace
-                aux(0, 0) = y(i, n)
+                aux1 = y(i, n)
                 y(i, n) = y(i, n) - 100 * dCdYi(i, n) + momentum * (y(i, n) - oldy(i, n))
-                oldy(i, n) = aux(0, 0)
+                oldy(i, n) = aux1
             Next n
         Next i
     Next iter
 End Sub
+Private Function GenerateHalfAMatrix(DimensionA As Variant) As Variant
+Dim aux() As Variant
+Dim p() As Variant
+Dim i As Byte
+Dim j As Byte
+ReDim p(1 To DimensionA - 1)
+For i = 1 To DimensionA - 1
+    ReDim aux(i + 1 To DimensionA)
+    For j = i + 1 To DimensionA
+        aux(j) = 0
+    Next j
+    p(i) = aux
+Next i
+GenerateHalfAMatrix = p
+End Function
+Private Function GenerateHalfAPrism(DimensionA As Variant, DimensionB As Variant) As Variant
+Dim aux() As Variant
+Dim aux2() As Variant
+Dim p() As Variant
+Dim i As Byte
+Dim j As Byte
+Dim k As Byte
+ReDim p(1 To DimensionA - 1)
+For i = 1 To DimensionA - 1
+    ReDim aux(1 + i To DimensionA)
+    For j = 1 + i To DimensionA
+        ReDim aux2(1 To DimensionB)
+        For k = 1 To DimensionB
+            aux2(k) = 0
+        Next
+        aux(j) = aux2
+    Next j
+    p(i) = aux
+Next i
+GenerateHalfAPrism = p
+End Function
