@@ -123,22 +123,25 @@ Private Function SearchMeForFixedPerpexity(x() As Variant, numberOfSamplesInX As
     ReDim aux(1 To numberOfSamplesInX, 1 To numberOfSamplesInX)
     aux = getMeThePairWiseAffinities1(x, numberOfSamplesInX, numberOfDimentions)
     For i = 1 To numberOfSamplesInX
-        top1(i) = -10
+        top1(i) = -20
         bottom1(i) = -0.001
     Next
     Dim IShouldStay As Boolean
     For iter = 1 To 50
-        IShouldStay = False
+        IShouldStay = True
         p = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, numberOfDimentions, top1)
         top2 = GetMeThePerplexity(p, numberOfSamplesInX)
         For i = 1 To numberOfSamplesInX
             If top2(i) < DesiredPerplexity Then
-                IShouldStay = True
+                IShouldStay = False
             End If
-            top1(i) = top1(i) * 2
         Next
         If IShouldStay Then
             iter = 50
+        Else
+            For i = 1 To numberOfSamplesInX
+                top1(i) = top1(i) * 2
+            Next
         End If
     Next
     For i = 1 To numberOfSamplesInX
