@@ -1,5 +1,5 @@
 Option Explicit
-Function TSNE(XasRange As Range, DesiredPerplexity As Double, numberOfIterations As Long, numberOfDimentionsInLowDimensionalSpace As Integer)
+Function TSNE(XasRange As Range, DesiredPerplexity As Double, Optional numberOfIterations As Long = 1500, Optional numberOfDimentionsInLowDimensionalSpace As Integer = 2, Optional LearningRatio As Double = 100, Optional Momentum As Double = 0.8)
     Randomize
     Dim p() As Variant 'pj|i and later will be pji
     Dim i As Long 'These are only going to help in the for loops
@@ -28,13 +28,15 @@ Function TSNE(XasRange As Range, DesiredPerplexity As Double, numberOfIterations
             p(i)(j) = p(i)(j) / numberOfSamplesInX
             ''p(i, j) = (p(i, j) + p(j, i)) / (2 * numberOfSamplesInX)
         Next j
-    Next i
-    For i = 1 To numberOfSamplesInX
         ''Sample Initial Solution Y
         For j = 1 To numberOfDimentionsInLowDimensionalSpace
             y(i, j) = Rnd()
         Next j
     Next i
+    ''Last Sample not used by i
+    For j = 1 To numberOfDimentionsInLowDimensionalSpace
+        y(numberOfSamplesInX, j) = Rnd()
+    Next j
     '''
     'for t=1 to T do
     'compute low-dimensional affinities qij
@@ -49,8 +51,8 @@ Function TSNE(XasRange As Range, DesiredPerplexity As Double, numberOfIterations
     Dim Sumq As Double
     Dim dCdYi() As Variant
     ReDim dCdYi(1 To numberOfSamplesInX, 1 To numberOfDimentionsInLowDimensionalSpace)
-    Call YUpload(p, q, Sumq, y, oldy, dCdYi, numberOfSamplesInX, numberOfDimentionsInLowDimensionalSpace, 20, 0.5)
-    Call YUpload(p, q, Sumq, y, oldy, dCdYi, numberOfSamplesInX, numberOfDimentionsInLowDimensionalSpace, numberOfIterations - 20, 0.8)
+    Call YUpload(p, q, Sumq, y, oldy, dCdYi, numberOfSamplesInX, numberOfDimentionsInLowDimensionalSpace, 20, Momentum * 0.5, LearningRatio)
+    Call YUpload(p, q, Sumq, y, oldy, dCdYi, numberOfSamplesInX, numberOfDimentionsInLowDimensionalSpace, numberOfIterations - 20, Momentum, LearningRatio)
     TSNE = y
 End Function
 Private Function getMeThePairWiseAffinities1(x() As Variant, numberOfSamplesInX As Long, numberOfDimentions As Long)
@@ -121,21 +123,35 @@ Private Function SearchMeForFixedPerpexity(x() As Variant, numberOfSamplesInX As
     ReDim aux(1 To numberOfSamplesInX, 1 To numberOfSamplesInX)
     aux = getMeThePairWiseAffinities1(x, numberOfSamplesInX, numberOfDimentions)
     For i = 1 To numberOfSamplesInX
-        top1(i) = -100000
+        top1(i) = -10
         bottom1(i) = -0.001
+    Next
+    Dim IShouldStay As Boolean
+    For iter = 1 To 50
+        IShouldStay = False
+        p = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, numberOfDimentions, top1)
+        top2 = GetMeThePerplexity(p, numberOfSamplesInX)
+        For i = 1 To numberOfSamplesInX
+            If top2(i) < DesiredPerplexity Then
+                IShouldStay = True
+            End If
+            top1(i) = top1(i) * 2
+        Next
+        If IShouldStay Then
+            iter = 50
+        End If
+    Next
+    For i = 1 To numberOfSamplesInX
         middle1(i) = (top1(i) + bottom1(i)) / 2
-    Next i
-    p = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, numberOfDimentions, top1)
-    top2 = GetMeThePerplexity(p, numberOfSamplesInX)
+    Next
     p = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, numberOfDimentions, bottom1)
     bottom2 = GetMeThePerplexity(p, numberOfSamplesInX)
     p = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, numberOfDimentions, middle1)
     middle2 = GetMeThePerplexity(p, numberOfSamplesInX)
-    For iter = 1 To 500
+    For iter = 1 To 100
         ''Decision Maker (you can do better than this, see it later)
         For i = 1 To numberOfSamplesInX
             If Abs(middle2(i) - DesiredPerplexity) < 0.01 Or iter = 500 Then
-                minusTwoSigmaSquared(i) = middle1(i)
             ElseIf middle2(i) > DesiredPerplexity Then
                 top1(i) = middle1(i)
                 top2(i) = middle2(i)
@@ -170,7 +186,7 @@ Private Function GetMeThePerplexity(p() As Variant, numberOfSamplesInX As Long) 
     Next i
     GetMeThePerplexity = Perplexities
 End Function
-Private Sub YUpload(ByRef p() As Variant, ByRef q() As Variant, ByRef Sumq As Variant, ByRef y() As Variant, ByRef oldy() As Variant, ByRef dCdYi() As Variant, ByRef numberOfSamplesInX As Long, ByRef numberOfDimentionsInLowDimensionalSpace As Integer, ByRef numberOfIterations As Long, ByRef momentum As Double)
+Private Sub YUpload(ByRef p() As Variant, ByRef q() As Variant, ByRef Sumq As Variant, ByRef y() As Variant, ByRef oldy() As Variant, ByRef dCdYi() As Variant, ByRef numberOfSamplesInX As Long, ByRef numberOfDimentionsInLowDimensionalSpace As Integer, ByRef numberOfIterations As Long, ByRef Momentum As Double, LearningRatio As Double)
     Dim aux() As Variant
     Dim aux1 As Double
     Dim i As Long
@@ -221,7 +237,7 @@ Private Sub YUpload(ByRef p() As Variant, ByRef q() As Variant, ByRef Sumq As Va
         For i = 1 To numberOfSamplesInX
             For n = 1 To numberOfDimentionsInLowDimensionalSpace
                 aux1 = y(i, n)
-                y(i, n) = y(i, n) - 100 * dCdYi(i, n) + momentum * (y(i, n) - oldy(i, n))
+                y(i, n) = y(i, n) - LearningRatio * dCdYi(i, n) + Momentum * (y(i, n) - oldy(i, n))
                 oldy(i, n) = aux1
             Next n
         Next i
