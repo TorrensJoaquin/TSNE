@@ -121,7 +121,7 @@ Private Function SearchMeForFixedPerpexity(x() As Variant, numberOfSamplesInX As
     ReDim aux(1 To numberOfSamplesInX, 1 To numberOfSamplesInX)
     aux = getMeThePairWiseAffinities1(x, numberOfSamplesInX, numberOfDimentions)
     For i = 1 To numberOfSamplesInX
-        top1(i) = -20
+        top1(i) = -50
         bottom1(i) = -0.001
     Next
     Dim IShouldStay As Boolean
@@ -196,8 +196,7 @@ Private Function GetMeThePerplexity(p() As Variant, numberOfSamplesInX As Long) 
     GetMeThePerplexity = Perplexities
 End Function
 Private Sub YUpload(ByRef p() As Variant, ByRef q() As Variant, ByRef Sumq As Variant, ByRef y() As Variant, ByRef oldy() As Variant, ByRef dCdYi() As Variant, ByRef numberOfSamplesInX As Long, ByRef numberOfDimentionsInLowDimensionalSpace As Integer, ByRef numberOfIterations As Long, ByRef Momentum As Double, LearningRatio As Double)
-    Dim aux() As Variant
-    Dim aux1 As Double
+    Dim aux As Double
     Dim i As Long
     Dim j As Long
     Dim iter As Long
@@ -210,13 +209,9 @@ Private Sub YUpload(ByRef p() As Variant, ByRef q() As Variant, ByRef Sumq As Va
                 Next n
             Next j
         Next i
-        aux = GenerateHalfAPrism(numberOfSamplesInX, numberOfDimentionsInLowDimensionalSpace)
         For i = 1 To numberOfSamplesInX - 1
             For j = 1 + i To numberOfSamplesInX
                 q(i)(j) = (1 + q(i)(j)) ^ -1
-                For n = 1 To numberOfDimentionsInLowDimensionalSpace
-                    aux(i)(j)(n) = q(i)(j)
-                Next n
                 Sumq = Sumq + 2 * q(i)(j)
             Next j
         Next i
@@ -228,18 +223,18 @@ Private Sub YUpload(ByRef p() As Variant, ByRef q() As Variant, ByRef Sumq As Va
         For i = 1 To numberOfSamplesInX - 1
             For n = 1 To numberOfDimentionsInLowDimensionalSpace
                 For j = 1 + i To numberOfSamplesInX
-                    aux1 = (p(i)(j) - q(i)(j)) * aux(i)(j)(n) * (y(i, n) - y(j, n))
-                    dCdYi(i, n) = dCdYi(i, n) + aux1
-                    dCdYi(j, n) = dCdYi(j, n) - aux1
+                    aux = (p(i)(j) - q(i)(j)) * q(i)(j) * Sumq * (y(i, n) - y(j, n))
+                    dCdYi(i, n) = dCdYi(i, n) + aux
+                    dCdYi(j, n) = dCdYi(j, n) - aux
                 Next j
             Next n
         Next i
         ''Y adjustment
         For i = 1 To numberOfSamplesInX
             For n = 1 To numberOfDimentionsInLowDimensionalSpace
-                aux1 = y(i, n)
+                aux = y(i, n)
                 y(i, n) = y(i, n) - LearningRatio * dCdYi(i, n) + Momentum * (y(i, n) - oldy(i, n))
-                oldy(i, n) = aux1
+                oldy(i, n) = aux
             Next n
         Next i
     Next iter
@@ -258,25 +253,4 @@ For i = 1 To DimensionA - 1
     p(i) = aux
 Next i
 GenerateHalfAMatrix = p
-End Function
-Private Function GenerateHalfAPrism(DimensionA As Variant, DimensionB As Variant) As Variant
-Dim aux() As Variant
-Dim aux2() As Variant
-Dim p() As Variant
-Dim i As Byte
-Dim j As Byte
-Dim k As Byte
-ReDim p(1 To DimensionA - 1)
-For i = 1 To DimensionA - 1
-    ReDim aux(1 + i To DimensionA)
-    For j = 1 + i To DimensionA
-        ReDim aux2(1 To DimensionB)
-        For k = 1 To DimensionB
-            aux2(k) = 0
-        Next
-        aux(j) = aux2
-    Next j
-    p(i) = aux
-Next i
-GenerateHalfAPrism = p
 End Function
