@@ -7,7 +7,6 @@ Function TSNE(XasRange As Range, DesiredPerplexity As Double, Optional numberOfI
     Dim n As Long 'These are only going to help in the for loops
     Dim x() As Variant
     Dim numberOfSamplesInX As Long
-    Dim iter As Long
     Dim numberOfDimentions As Long
     Dim y() As Variant
     Dim oldy() As Variant
@@ -26,7 +25,6 @@ Function TSNE(XasRange As Range, DesiredPerplexity As Double, Optional numberOfI
     For i = 1 To numberOfSamplesInX - 1
         For j = i + 1 To numberOfSamplesInX
             p(i)(j) = p(i)(j) / numberOfSamplesInX
-            ''p(i, j) = (p(i, j) + p(j, i)) / (2 * numberOfSamplesInX)
         Next j
         ''Sample Initial Solution Y
         For j = 1 To numberOfDimentionsInLowDimensionalSpace
@@ -72,12 +70,12 @@ Private Function getMeThePairWiseAffinities1(x() As Variant, numberOfSamplesInX 
     Next i
     getMeThePairWiseAffinities1 = p
 End Function
-Private Function getMeThePairWiseAffinities2(aux() As Variant, numberOfSamplesInX As Long, numberOfDimentions As Long, minusTwoSigmaSquared() As Variant)
+Private Function getMeThePairWiseAffinities2(aux() As Variant, numberOfSamplesInX As Long, minusTwoSigmaSquared() As Variant)
     '' get the sum of pair wise affinities and the non normilized pair wise affinities
     Dim i As Long 'These are only going to help in the for loops
     Dim j As Long 'These are only going to help in the for loops
     Dim p() As Variant
-    p = GenerateHalfAMatrix(numberOfSamplesInX)
+    p = aux
     Dim sumOfPairWiseAffinities() As Variant
     ReDim sumOfPairWiseAffinities(1 To numberOfSamplesInX)
     For i = 1 To numberOfSamplesInX - 1
@@ -100,8 +98,6 @@ Private Function getMeThePairWiseAffinities2(aux() As Variant, numberOfSamplesIn
     getMeThePairWiseAffinities2 = p
 End Function
 Private Function SearchMeForFixedPerpexity(x() As Variant, numberOfSamplesInX As Long, numberOfDimentions As Long, DesiredPerplexity As Double) As Variant
-    Dim minusTwoSigmaSquared() As Variant
-    ReDim minusTwoSigmaSquared(1 To numberOfSamplesInX)
     Dim i As Long 'These are only going to help in the for loops
     Dim iter As Long 'These are only going to help in the for loops
     Dim top1() As Variant
@@ -127,7 +123,7 @@ Private Function SearchMeForFixedPerpexity(x() As Variant, numberOfSamplesInX As
     Dim IShouldStay As Boolean
     For iter = 1 To 50
         IShouldStay = True
-        p = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, numberOfDimentions, top1)
+        p = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, top1)
         top2 = GetMeThePerplexity(p, numberOfSamplesInX)
         For i = 1 To numberOfSamplesInX
             If top2(i) < DesiredPerplexity Then
@@ -136,12 +132,12 @@ Private Function SearchMeForFixedPerpexity(x() As Variant, numberOfSamplesInX As
             End If
         Next
         If IShouldStay Then
-            iter = 50
+            Exit For
         End If
     Next
     For iter = 1 To 50
         IShouldStay = True
-        p = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, numberOfDimentions, bottom1)
+        p = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, bottom1)
         bottom2 = GetMeThePerplexity(p, numberOfSamplesInX)
         For i = 1 To numberOfSamplesInX
             If bottom2(i) > DesiredPerplexity Then
@@ -150,13 +146,13 @@ Private Function SearchMeForFixedPerpexity(x() As Variant, numberOfSamplesInX As
             End If
         Next
         If IShouldStay Then
-            iter = 50
+            Exit For
         End If
     Next
     For i = 1 To numberOfSamplesInX
         middle1(i) = (top1(i) + bottom1(i)) / 2
     Next
-    p = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, numberOfDimentions, middle1)
+    p = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, middle1)
     middle2 = GetMeThePerplexity(p, numberOfSamplesInX)
     For iter = 1 To 100
         ''Decision Maker (you can do better than this, see it later)
@@ -172,7 +168,7 @@ Private Function SearchMeForFixedPerpexity(x() As Variant, numberOfSamplesInX As
                 middle1(i) = (top1(i) + bottom1(i)) / 2
             End If
         Next i
-        p = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, numberOfDimentions, middle1)
+        p = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, middle1)
         middle2 = GetMeThePerplexity(p, numberOfSamplesInX)
     Next iter
     SearchMeForFixedPerpexity = p
@@ -199,8 +195,8 @@ Private Sub YUpload(ByRef p() As Variant, ByRef q() As Variant, ByRef Sumq As Va
     Dim aux As Double
     Dim i As Long
     Dim j As Long
-    Dim iter As Long
     Dim n As Integer
+    Dim iter As Long
     For iter = 1 To numberOfIterations
         For i = 1 To numberOfSamplesInX - 1
             For j = 1 + i To numberOfSamplesInX
