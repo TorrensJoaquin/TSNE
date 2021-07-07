@@ -203,23 +203,14 @@ Private Sub YUpload(ByRef p() As Variant, ByRef q() As Variant, ByRef Sumq As Va
                 For n = 1 To numberOfDimentionsInLowDimensionalSpace
                     q(i)(j) = q(i)(j) + (y(i, n) - y(j, n)) ^ 2
                 Next n
-            Next j
-        Next i
-        For i = 1 To numberOfSamplesInX - 1
-            For j = 1 + i To numberOfSamplesInX
                 q(i)(j) = (1 + q(i)(j)) ^ -1
                 Sumq = Sumq + 2 * q(i)(j)
             Next j
-        Next i
-        For i = 1 To numberOfSamplesInX - 1
-            For j = 1 + i To numberOfSamplesInX
-                q(i)(j) = q(i)(j) / Sumq
-            Next j
-        Next i
+        Next i ''Q is in rality Zq or q * Sumq
         For i = 1 To numberOfSamplesInX - 1
             For n = 1 To numberOfDimentionsInLowDimensionalSpace
                 For j = 1 + i To numberOfSamplesInX
-                    aux = (p(i)(j) - q(i)(j)) * q(i)(j) * Sumq * (y(i, n) - y(j, n))
+                    aux = (p(i)(j) - q(i)(j) / Sumq) * q(i)(j) * (y(i, n) - y(j, n))
                     dCdYi(i, n) = dCdYi(i, n) + aux
                     dCdYi(j, n) = dCdYi(j, n) - aux
                 Next j
