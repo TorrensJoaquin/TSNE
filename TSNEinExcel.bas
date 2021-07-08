@@ -44,13 +44,13 @@ Function TSNE(XasRange As Range, DesiredPerplexity As Double, Optional numberOfI
     'Set y(t)=y(t-1) + n dCdy + a(t) * (y(t-1)-y(t-2))
     'end
     '''
-    Dim q() As Variant 'qji
-    q = GenerateHalfAMatrix(numberOfSamplesInX)
+    Dim QZ() As Variant 'qji
+    QZ = GenerateHalfAMatrix(numberOfSamplesInX)
     Dim Sumq As Double
     Dim dCdYi() As Variant
     ReDim dCdYi(1 To numberOfSamplesInX, 1 To numberOfDimentionsInLowDimensionalSpace)
-    Call YUpload(p, q, Sumq, y, oldy, dCdYi, numberOfSamplesInX, numberOfDimentionsInLowDimensionalSpace, 20, Momentum * 0.5, LearningRatio)
-    Call YUpload(p, q, Sumq, y, oldy, dCdYi, numberOfSamplesInX, numberOfDimentionsInLowDimensionalSpace, numberOfIterations - 20, Momentum, LearningRatio)
+    Call YUpload(p, QZ, Sumq, y, oldy, dCdYi, numberOfSamplesInX, numberOfDimentionsInLowDimensionalSpace, 20, Momentum * 0.5, LearningRatio)
+    Call YUpload(p, QZ, Sumq, y, oldy, dCdYi, numberOfSamplesInX, numberOfDimentionsInLowDimensionalSpace, numberOfIterations - 20, Momentum, LearningRatio)
     TSNE = y
 End Function
 Private Function getMeThePairWiseAffinities1(x() As Variant, numberOfSamplesInX As Long, numberOfDimentions As Long)
@@ -81,10 +81,6 @@ Private Function getMeThePairWiseAffinities2(aux() As Variant, numberOfSamplesIn
     For i = 1 To numberOfSamplesInX - 1
         For j = 1 + i To numberOfSamplesInX
             p(i)(j) = Exp((aux(i)(j)) / minusTwoSigmaSquared(i))
-        Next j
-    Next i
-    For i = 1 To numberOfSamplesInX - 1
-        For j = 1 + i To numberOfSamplesInX
             sumOfPairWiseAffinities(i) = sumOfPairWiseAffinities(i) + p(i)(j)
             sumOfPairWiseAffinities(j) = sumOfPairWiseAffinities(j) + p(i)(j)
         Next j
@@ -191,7 +187,7 @@ Private Function GetMeThePerplexity(p() As Variant, numberOfSamplesInX As Long) 
     Next i
     GetMeThePerplexity = Perplexities
 End Function
-Private Sub YUpload(ByRef p() As Variant, ByRef q() As Variant, ByRef Sumq As Variant, ByRef y() As Variant, ByRef oldy() As Variant, ByRef dCdYi() As Variant, ByRef numberOfSamplesInX As Long, ByRef numberOfDimentionsInLowDimensionalSpace As Integer, ByRef numberOfIterations As Long, ByRef Momentum As Double, LearningRatio As Double)
+Private Sub YUpload(ByRef p() As Variant, ByRef QZ() As Variant, ByRef Sumq As Variant, ByRef y() As Variant, ByRef oldy() As Variant, ByRef dCdYi() As Variant, ByRef numberOfSamplesInX As Long, ByRef numberOfDimentionsInLowDimensionalSpace As Integer, ByRef numberOfIterations As Long, ByRef Momentum As Double, LearningRatio As Double)
     Dim aux As Double
     Dim i As Long
     Dim j As Long
@@ -201,16 +197,18 @@ Private Sub YUpload(ByRef p() As Variant, ByRef q() As Variant, ByRef Sumq As Va
         For i = 1 To numberOfSamplesInX - 1
             For j = 1 + i To numberOfSamplesInX
                 For n = 1 To numberOfDimentionsInLowDimensionalSpace
-                    q(i)(j) = q(i)(j) + (y(i, n) - y(j, n)) ^ 2
+                    QZ(i)(j) = QZ(i)(j) + (y(i, n) - y(j, n)) ^ 2
                 Next n
-                q(i)(j) = (1 + q(i)(j)) ^ -1
-                Sumq = Sumq + 2 * q(i)(j)
+                QZ(i)(j) = (1 + QZ(i)(j)) ^ -1
+                Sumq = Sumq + 2 * QZ(i)(j)
             Next j
-        Next i ''Q is in rality Zq or q * Sumq
+        Next i
         For i = 1 To numberOfSamplesInX - 1
             For n = 1 To numberOfDimentionsInLowDimensionalSpace
                 For j = 1 + i To numberOfSamplesInX
-                    aux = (p(i)(j) - q(i)(j) / Sumq) * q(i)(j) * (y(i, n) - y(j, n))
+                    ''aux = (p(i)(j) - q(i)(j) / Sumq) * q(i)(j) * (y(i, n) - y(j, n))
+                    aux = p(i)(j) * QZ(i)(j) * (y(i, n) - y(j, n))
+                    aux = aux - QZ(i)(j) ^ 2 / Sumq * (y(i, n) - y(j, n))
                     dCdYi(i, n) = dCdYi(i, n) + aux
                     dCdYi(j, n) = dCdYi(j, n) - aux
                 Next j
