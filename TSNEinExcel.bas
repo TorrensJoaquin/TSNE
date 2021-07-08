@@ -172,6 +172,7 @@ Private Function GetMeThePerplexity(p() As Variant, numberOfSamplesInX As Long) 
 End Function
 Private Sub YUpload(ByRef p() As Variant, ByRef QZ() As Variant, ByRef Sumq As Variant, ByRef y() As Variant, ByRef oldy() As Variant, ByRef dCdYi() As Variant, ByRef numberOfSamplesInX As Long, ByRef numberOfDimentionsInLowDimensionalSpace As Integer, ByRef numberOfIterations As Long, ByRef Momentum As Double, LearningRatio As Double)
     Dim aux As Double
+    Dim aux1 As Double
     Dim i As Long
     Dim j As Long
     Dim n As Integer
@@ -187,13 +188,14 @@ Private Sub YUpload(ByRef p() As Variant, ByRef QZ() As Variant, ByRef Sumq As V
             Next j
         Next i
         For i = 1 To numberOfSamplesInX - 1
-            For n = 1 To numberOfDimentionsInLowDimensionalSpace
-                For j = 1 + i To numberOfSamplesInX
-                    aux = (p(i)(j) - QZ(i)(j) / Sumq) * QZ(i)(j) * (y(i, n) - y(j, n))
-                    dCdYi(i, n) = dCdYi(i, n) + aux
-                    dCdYi(j, n) = dCdYi(j, n) - aux
-                Next j
-            Next n
+            For j = 1 + i To numberOfSamplesInX
+                aux = (p(i)(j) - QZ(i)(j) / Sumq) * QZ(i)(j)
+                For n = 1 To numberOfDimentionsInLowDimensionalSpace
+                    aux1 = aux * (y(i, n) - y(j, n))
+                    dCdYi(i, n) = dCdYi(i, n) + aux1
+                    dCdYi(j, n) = dCdYi(j, n) - aux1
+                Next n
+            Next j
         Next i
         For i = 1 To numberOfSamplesInX
             For n = 1 To numberOfDimentionsInLowDimensionalSpace
