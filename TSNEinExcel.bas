@@ -22,11 +22,11 @@ Function TSNE(XasRange As Range, DesiredPerplexity As Double, Optional numberOfI
             p(i)(j) = p(i)(j) / numberOfSamplesInX
         Next j
         For j = 1 To numberOfDimentionsInLowDimensionalSpace
-            y(i, j) = Rnd() * 100 - 50
+            y(i, j) = Rnd()
         Next j
     Next i
     For j = 1 To numberOfDimentionsInLowDimensionalSpace
-        y(numberOfSamplesInX, j) = Rnd() * 100 - 50
+        y(numberOfSamplesInX, j) = Rnd()
     Next j
     ''ReDim dCdYi(1 To numberOfSamplesInX, 1 To numberOfDimentionsInLowDimensionalSpace)
     Call YUpload(p, y, oldy, numberOfSamplesInX, numberOfDimentionsInLowDimensionalSpace, 20, Momentum * 0.5, LearningRatio)
