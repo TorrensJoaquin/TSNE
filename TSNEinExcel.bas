@@ -22,19 +22,15 @@ Function TSNE(XasRange As Range, DesiredPerplexity As Double, Optional numberOfI
             p(i)(j) = p(i)(j) / numberOfSamplesInX
         Next j
         For j = 1 To numberOfDimentionsInLowDimensionalSpace
-            y(i, j) = Rnd()
+            y(i, j) = Rnd() * 100 - 50
         Next j
     Next i
     For j = 1 To numberOfDimentionsInLowDimensionalSpace
-        y(numberOfSamplesInX, j) = Rnd()
+        y(numberOfSamplesInX, j) = Rnd() * 100 - 50
     Next j
-    Dim QZ() As Variant 'Zqji
-    QZ = GenerateHalfAMatrix(numberOfSamplesInX)
-    Dim Sumq As Double
-    Dim dCdYi() As Variant
-    ReDim dCdYi(1 To numberOfSamplesInX, 1 To numberOfDimentionsInLowDimensionalSpace)
-    Call YUpload(p, QZ, Sumq, y, oldy, dCdYi, numberOfSamplesInX, numberOfDimentionsInLowDimensionalSpace, 20, Momentum * 0.5, LearningRatio)
-    Call YUpload(p, QZ, Sumq, y, oldy, dCdYi, numberOfSamplesInX, numberOfDimentionsInLowDimensionalSpace, numberOfIterations - 20, Momentum, LearningRatio)
+    ''ReDim dCdYi(1 To numberOfSamplesInX, 1 To numberOfDimentionsInLowDimensionalSpace)
+    Call YUpload(p, y, oldy, numberOfSamplesInX, numberOfDimentionsInLowDimensionalSpace, 20, Momentum * 0.5, LearningRatio)
+    Call YUpload(p, y, oldy, numberOfSamplesInX, numberOfDimentionsInLowDimensionalSpace, numberOfIterations - 20, Momentum, LearningRatio)
     TSNE = y
 End Function
 Private Function getMeThePairWiseAffinities1(x() As Variant, numberOfSamplesInX As Long, numberOfDimentions As Long)
@@ -170,14 +166,19 @@ Private Function GetMeThePerplexity(p() As Variant, numberOfSamplesInX As Long) 
     Next i
     GetMeThePerplexity = Perplexities
 End Function
-Private Sub YUpload(ByRef p() As Variant, ByRef QZ() As Variant, ByRef Sumq As Variant, ByRef y() As Variant, ByRef oldy() As Variant, ByRef dCdYi() As Variant, ByRef numberOfSamplesInX As Long, ByRef numberOfDimentionsInLowDimensionalSpace As Integer, ByRef numberOfIterations As Long, ByRef Momentum As Double, LearningRatio As Double)
+Private Sub YUpload(ByRef p() As Variant, ByRef y() As Variant, ByRef oldy() As Variant, ByRef numberOfSamplesInX As Long, ByRef numberOfDimentionsInLowDimensionalSpace As Integer, ByRef numberOfIterations As Long, ByRef Momentum As Double, LearningRatio As Double)
     Dim aux As Double
     Dim aux1 As Double
+    Dim dCdYi() As Variant
     Dim i As Long
     Dim j As Long
     Dim n As Integer
+    Dim QZ() As Variant 'Zqji
+    QZ = GenerateHalfAMatrix(numberOfSamplesInX)
     Dim iter As Long
+    Dim Sumq As Double
     For iter = 1 To numberOfIterations
+        ReDim dCdYi(1 To numberOfSamplesInX, 1 To numberOfDimentionsInLowDimensionalSpace)
         For i = 1 To numberOfSamplesInX - 1
             For j = 1 + i To numberOfSamplesInX
                 For n = 1 To numberOfDimentionsInLowDimensionalSpace
