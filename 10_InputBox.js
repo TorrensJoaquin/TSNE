@@ -8,6 +8,7 @@ function CreateTheInputsBoxes(){
     LabelsFromXLS.position(570,230);
 }
 function InputIsActivated1(){
+    X = [];
     if(InputFromXLS.elt.value != ''){
         generateTable1(InputFromXLS.elt.value);
     };
