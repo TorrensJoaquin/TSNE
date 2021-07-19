@@ -23,13 +23,16 @@ function CreateTheInputs(){
     inpMomentum.input(myInputMomentum);
     function myInputPerplexity(){
         DesiredPerplexity = UpdateComponent(inpPerplexity);
+        TradeOff = UpdateComponent(inpTradeOff);
+        LearningRatio = UpdateComponent(inpLearningRatio);
         shouldIStartAllOverAgain = true;
+        Momentum = UpdateComponent(inpMomentum);
     }
     function myInputTradeOff(){
-        TradeOff = UpdateComponent(inpTradeOff);
+        TradeOff = UpdateComponent(inpTradeOff) * 1.73;
     }
     function myInputLearningRatio(){
-        LearningRatio = UpdateComponent(inpLearningRatio);
+        LearningRatio = UpdateComponent(inpLearningRatio) * 4;
     }
     function myInputMomentum(){
         Momentum = UpdateComponent(inpMomentum);
