@@ -9,6 +9,7 @@ function CreateTheInputsBoxes(){
 }
 function InputIsActivated1(){
     X = [];
+    points = [];
     if(InputFromXLS.elt.value != ''){
         generateTable1(InputFromXLS.elt.value);
     };
