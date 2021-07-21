@@ -17,6 +17,7 @@ function InputIsActivated1(){
     TradeOff = UpdateComponent(inpTradeOff);
     LearningRatio = UpdateComponent(inpLearningRatio);
     shouldIStartAllOverAgain = true;
+    shouldIStartReInitializeY = true;
     Momentum = UpdateComponent(inpMomentum);
     shouldIStartAllOverAgain = true;
 }
