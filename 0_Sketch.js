@@ -11,6 +11,21 @@ let Maximum;
 let angle = 0;
 let shouldIStartAllOverAgain = true;
 let shouldIStartReInitializeY = true;
+let rotationZ = [
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 1],
+];
+let rotationX = [
+    [1, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0],
+];
+let rotationY = [
+    [0, 0, 0],
+    [0, 1, 0],
+    [0, 0, 0],
+];
 const projection = [
     [1, 0, 0],
     [0, 1, 0],
@@ -98,8 +113,8 @@ function draw(){
         }
         //Sample Initial Solution Y
         if(shouldIStartReInitializeY){
-            y=zeros([numberOfSamplesInX-1,2]);
-            oldy=zeros([numberOfSamplesInX-1,2]);
+            y=zeros2(numberOfSamplesInX);
+            oldy=zeros2(numberOfSamplesInX);
             for(let i = 0; i <= numberOfSamplesInX - 2; i++){
                 for(let n = 0; n <= 2; n++){
                     y[i][n] = Math.random()-0.5;
@@ -116,21 +131,21 @@ function draw(){
         if(Math.abs(y[i][1])>Maximum){Maximum = Math.abs(y[i][1])}
         if(Math.abs(y[i][2])>Maximum){Maximum = Math.abs(y[i][2])}
     }
-    const rotationZ = [
-        [cos(angle), -sin(angle), 0],
-        [sin(angle), cos(angle), 0],
-        [0, 0, 1],
-    ];
-    const rotationX = [
-        [1, 0, 0],
-        [0, cos(angle), -sin(angle)],
-        [0, sin(angle), cos(angle)],
-    ];
-    const rotationY = [
-        [cos(angle), 0, sin(angle)],
-        [0, 1, 0],
-        [-sin(angle), 0, cos(angle)],
-    ];
+    rotationZ[0][0]=cos(angle);
+    rotationZ[1][0]=sin(angle);
+    rotationZ[0][1]=-rotationZ[1][0];
+    rotationZ[1][1]=rotationZ[0][0];
+    rotationX[1][1]=rotationZ[0][0];
+    rotationX[1][2]=rotationZ[0][1];
+    rotationX[2][1]=rotationZ[1][0];
+    rotationX[2][2]=rotationZ[0][0];
+    rotationY[0][0] = rotationZ[0][0];
+    rotationY[0][2] = rotationZ[1][0];
+    rotationY[2][0] = rotationZ[0][1];
+    rotationY[2][2] = rotationZ[0][0];
+    strokeWeight(5);
+    noFill();
+    stroke(255);
     let projected = [];
     for (let i = 0; i < y.length; i++) {
         let rotated = matmul(rotationY, y[i]);
@@ -140,11 +155,6 @@ function draw(){
         projected[i] = [];
         projected[i][0] = projected2d[0] * 300 / Maximum + 350;
         projected[i][1] = projected2d[1] * 300 / Maximum + 350;
-    }
-    for (let i = 0; i < projected.length; i++) {
-        strokeWeight(5);
-        noFill();
-        stroke(255);
         point((projected[i][0]), (projected[i][1]));
     }
     if (mouseX > 0 && mouseX < 700 && mouseY > 0 && mouseY < 700){
@@ -243,8 +253,8 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
         IndexElements[i] = i;
     }
     for(let iter = 0; iter <= numberOfIterations; iter++){
-        let Fattr = zeros([numberOfSamplesInX-1,2]);
-        let Frep = zeros([numberOfSamplesInX-1,2]);
+        let Fattr = zeros2(numberOfSamplesInX);
+        let Frep = zeros2(numberOfSamplesInX);
         let Sumq = 0;
         OctTree = new OctTreeElement([0,0,0], BiggestY);
         OctTree.InsertInBoxes(y, IndexElements);
@@ -254,11 +264,15 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
                 j = VantagePointQueryArray[i][z] - i - 1;
                 if(j <= numberOfSamplesInX - i - 2 && j > 0){
                     aux1=p[i][z] * CalculateZQij( i, j + i + 1);
-                    for(let n = 0; n <= 2; n++){
-                        aux = aux1 * (y[i][n] - y[j+ i + 1][n]);
-                        Fattr[i][n] = Fattr[i][n] + aux;
-                        Fattr[j + i + 1][n] = Fattr[j + i + 1][n] - aux;
-                    }
+                    aux = aux1 * (y[i][0] - y[j+ i + 1][0]);
+                    Fattr[i][0] = Fattr[i][0] + aux;
+                    Fattr[j + i + 1][0] = Fattr[j + i + 1][0] - aux;
+                    aux = aux1 * (y[i][1] - y[j+ i + 1][1]);
+                    Fattr[i][1] = Fattr[i][1] + aux;
+                    Fattr[j + i + 1][1] = Fattr[j + i + 1][1] - aux;
+                    aux = aux1 * (y[i][2] - y[j+ i + 1][2]);
+                    Fattr[i][2] = Fattr[i][2] + aux;
+                    Fattr[j + i + 1][2] = Fattr[j + i + 1][2] - aux;
                 }
             }
         }
@@ -268,43 +282,53 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
                 aux = CalculateZQij2( i, ResultOT.ResultOfTheQueryOT1[z]);
                 Sumq = Sumq + ResultOT.ResultOfTheQueryOT2[z] * 2 / aux;
                 aux1 = Math.pow(aux, 2);
-                for(let n = 0; n <= 2; n++){
-                    aux = aux1 * (y[i][n] - ResultOT.ResultOfTheQueryOT1[z][n] * ResultOT.ResultOfTheQueryOT2[z])
-                    Frep[i][n] = Frep[i][n] - aux;
-                }
+                aux = aux1 * (y[i][0] - ResultOT.ResultOfTheQueryOT1[z][0] * ResultOT.ResultOfTheQueryOT2[z])
+                Frep[i][0] = Frep[i][0] - aux;
+                aux = aux1 * (y[i][1] - ResultOT.ResultOfTheQueryOT1[z][1] * ResultOT.ResultOfTheQueryOT2[z])
+                Frep[i][1] = Frep[i][1] - aux;
+                aux = aux1 * (y[i][2] - ResultOT.ResultOfTheQueryOT1[z][2] * ResultOT.ResultOfTheQueryOT2[z])
+                Frep[i][2] = Frep[i][2] - aux;
             }
             for(let z = 0; z <= ResultOT.ResultOfTheQueryOT3.length - 1; z++){
                 aux = CalculateZQij( i, ResultOT.ResultOfTheQueryOT3[z]);
                 Sumq = Sumq +  2 / aux;
                 aux1 = Math.pow(aux, 2);
-                for(let n = 0; n <= 2; n++){
-                    aux = aux1 * (y[i][n] - y[ResultOT.ResultOfTheQueryOT3[z]][n]);
-                    Frep[i][n] = Frep[i][n] - aux;
-                }
+                aux = aux1 * (y[i][0] - y[ResultOT.ResultOfTheQueryOT3[z]][0]);
+                Frep[i][0] = Frep[i][0] - aux;
+                aux = aux1 * (y[i][1] - y[ResultOT.ResultOfTheQueryOT3[z]][1]);
+                Frep[i][1] = Frep[i][1] - aux;
+                aux = aux1 * (y[i][2] - y[ResultOT.ResultOfTheQueryOT3[z]][2]);
+                Frep[i][2] = Frep[i][2] - aux;
             }
         }
         //y adjustment
         for(let i = 0; i <= numberOfSamplesInX - 1; i++){
-            for(let n = 0; n <= 2; n++){
-                aux = y[i][n];
-                y[i][n] = y[i][n] - LearningRatio * (Fattr[i][n] + Frep[i][n] / Sumq) + Momentum * (y[i][n] - oldy[i][n]);
-                oldy[i][n] = aux;
-                if(BiggestY < Math.abs(y[i][n])){BiggestY = Math.abs(y[i][n])}
-            }
+            aux = y[i][0];
+            y[i][0] = y[i][0] - LearningRatio * (Fattr[i][0] + Frep[i][0] / Sumq) + Momentum * (y[i][0] - oldy[i][0]);
+            oldy[i][0] = aux;
+            if(BiggestY < Math.abs(y[i][0])){BiggestY = Math.abs(y[i][0])}
+            aux = y[i][1];
+            y[i][1] = y[i][1] - LearningRatio * (Fattr[i][1] + Frep[i][1] / Sumq) + Momentum * (y[i][1] - oldy[i][1]);
+            oldy[i][1] = aux;
+            if(BiggestY < Math.abs(y[i][1])){BiggestY = Math.abs(y[i][1])}
+            aux = y[i][2];
+            y[i][2] = y[i][2] - LearningRatio * (Fattr[i][2] + Frep[i][2] / Sumq) + Momentum * (y[i][2] - oldy[i][2]);
+            oldy[i][2] = aux;
+            if(BiggestY < Math.abs(y[i][2])){BiggestY = Math.abs(y[i][2])}
         }
     }
     function CalculateZQij( i, j){
         let aux=0;
-        for(let n = 0; n <= 2; n++){
-            aux = aux + Math.pow(y[i][n] - y[j][n], 2);
-        }
+        aux = aux + Math.pow(y[i][0] - y[j][0], 2);
+        aux = aux + Math.pow(y[i][1] - y[j][1], 2);
+        aux = aux + Math.pow(y[i][2] - y[j][2], 2);
         return Math.pow(1 + aux, -1);
     }
     function CalculateZQij2( i, CenterOfMass){
         let aux=0;
-        for(let n = 0; n <= 2; n++){
-            aux = aux + Math.pow(y[i][n] - CenterOfMass[n], 2);
-        }
+        aux = aux + Math.pow(y[i][0] - CenterOfMass[0], 2);
+        aux = aux + Math.pow(y[i][1] - CenterOfMass[1], 2);
+        aux = aux + Math.pow(y[i][2] - CenterOfMass[2], 2);
         return Math.pow(1 + aux, -1);
     }
 }
@@ -312,6 +336,13 @@ function zeros(dimensions){
     var array = [];
     for (var i = 0; i <= dimensions[0]; ++i) {
         array.push(dimensions.length == 1 ? 0 : zeros(dimensions.slice(1)));
+    }
+    return array;
+}
+function zeros2(dimensions){
+    var array = Array(dimensions);
+    for (var i = 0; i < dimensions; ++i) {
+        array[i] = Array(3).fill(0);
     }
     return array;
 }
@@ -340,4 +371,4 @@ function matmul(a, b) {
       }
     }
     return result;
-  }
+}
