@@ -8,10 +8,16 @@ function CreateTheInputsBoxes(){
     LabelsFromXLS.position(570,230);
 }
 function InputIsActivated1(){
+    X=[];
     if(InputFromXLS.elt.value != ''){
         generateTable1(InputFromXLS.elt.value);
     };
     Labels = undefined;
+    DesiredPerplexity = UpdateComponent(inpPerplexity);
+    TradeOff = UpdateComponent(inpTradeOff);
+    LearningRatio = UpdateComponent(inpLearningRatio);
+    shouldIStartAllOverAgain = true;
+    Momentum = UpdateComponent(inpMomentum);
     shouldIStartAllOverAgain = true;
 }
 function InputIsActivated2(){
@@ -40,7 +46,7 @@ function generateTable1(data) {
         }
         NumberOfRows = data.length;    
     }
-    X=zeros([NumberOfRows,NumberOfColumns]);
+    X=zeros([NumberOfRows - 1,NumberOfColumns - 1]);
     for(let i=0; i < NumberOfRows; i++){
         for(let j=0; j < NumberOfColumns; j++){
             X[i][j]=parseFloat(data[i][j]);
