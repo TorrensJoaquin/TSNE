@@ -8,8 +8,6 @@ function CreateTheInputsBoxes(){
     LabelsFromXLS.position(570,230);
 }
 function InputIsActivated1(){
-    X = [];
-    points = [];
     if(InputFromXLS.elt.value != ''){
         generateTable1(InputFromXLS.elt.value);
     };
@@ -56,24 +54,15 @@ function generateTable2(data) {
     for(let i=0; i < NumberOfRows; i++){
         data[i] = data[i].split('\t');
     }
-    let NumberOfColumns = data[0].length;
-    for(let i=0; i < NumberOfRows; i++){
-        for(let j=0; j < NumberOfColumns; j++){
-            if(NumberOfColumns != data[i].length){console.log('Error reading the row/column '+ j + 1)}
-            data[i][j] = data[i][j].replace(' ', ''); //Delete blank spaces if presents.
-        }
-    }
     LabelsFromXLS.elt.value = '';
+    Labels=Array(NumberOfRows);
+    for(let i=0; i < NumberOfRows; i++){
+            Labels[i]=data[i];
+    }
     function DeleteEmptySpaces(){
         for(let i=0; i < NumberOfRows; i++){
             if(data[i] == ''){data.splice(i,i)}
         }
         NumberOfRows = data.length;    
-    }
-    Labels=zeros([NumberOfRows,NumberOfColumns]);
-    for(let i=0; i < NumberOfRows; i++){
-        for(let j=0; j < NumberOfColumns; j++){
-            Labels[i][j]=data[i][j];
-        }
     }
 }
