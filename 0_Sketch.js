@@ -9,7 +9,6 @@ let oldy = [];
 let numberOfSamplesInX;
 let Maximum;
 let angle = 0;
-let points = [];
 let shouldIStartAllOverAgain = true;
 const projection = [
     [1, 0, 0],
@@ -24,6 +23,7 @@ function setup() {
 }
 function draw(){
     background(0);
+    let points = [];
     if (shouldIStartAllOverAgain == true){
         LearningRatio = LearningRatio * 4; //By definition of dydt ... It doesn't make sense having it inside the loop.
         TradeOff = TradeOff * 1.73; //sqrt of 3. Relationship between de side lenght and the diagonal of the octtree ... It doesn't make sense having it inside the loop.
