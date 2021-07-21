@@ -20,7 +20,6 @@ function InputIsActivated2(){
     if(LabelsFromXLS.elt.value != ''){
         generateTable2(LabelsFromXLS.elt.value);
     };
-    shouldIStartAllOverAgain = true;
 }
 function generateTable1(data) {
     data = data.split("\n");
