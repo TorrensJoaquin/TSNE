@@ -147,14 +147,15 @@ function draw(){
     noFill();
     stroke(255);
     let projected = [];
+    let compensation = 300 / Maximum;
     for (let i = 0; i < y.length; i++) {
         let rotated = matmul(rotationY, y[i]);
         rotated = matmul(rotationX, rotated);
         rotated = matmul(rotationZ, rotated);
         let projected2d = matmul(projection, rotated);
         projected[i] = [];
-        projected[i][0] = projected2d[0] * 300 / Maximum + 350;
-        projected[i][1] = projected2d[1] * 300 / Maximum + 350;
+        projected[i][0] = projected2d[0] * compensation + 350;
+        projected[i][1] = projected2d[1] * compensation + 350;
         point((projected[i][0]), (projected[i][1]));
     }
     if (mouseX > 0 && mouseX < 700 && mouseY > 0 && mouseY < 700){
