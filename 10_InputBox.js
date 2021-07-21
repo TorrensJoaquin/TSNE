@@ -13,7 +13,7 @@ function InputIsActivated1(){
     if(InputFromXLS.elt.value != ''){
         generateTable1(InputFromXLS.elt.value);
     };
-    Labels = [];
+    Labels = undefined;
     shouldIStartAllOverAgain = true;
 }
 function InputIsActivated2(){
