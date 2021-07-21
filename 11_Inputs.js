@@ -37,10 +37,10 @@ function CreateTheInputs(){
     function myInputMomentum(){
         Momentum = UpdateComponent(inpMomentum);
     }
-    function UpdateComponent(ComponentOfDOM){
-        if(ComponentOfDOM.elt.value==''){
-            return 0;
-        }
-        return parseFloat(ComponentOfDOM.elt.value);
+}
+function UpdateComponent(ComponentOfDOM){
+    if(ComponentOfDOM.elt.value==''){
+        return 0;
     }
+    return parseFloat(ComponentOfDOM.elt.value);
 }
