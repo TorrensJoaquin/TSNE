@@ -11,6 +11,13 @@ let angle = 0;
 let BiggestY = 2;
 let shouldIStartAllOverAgain = true;
 let shouldIStartReInitializeY = true;
+let ColorMode = 2;
+let EarlyExageration ={
+    DidIFinish : false,
+    Counter : 0,
+    Iterations : 250,
+    Factor : 4,
+}
 let rotationZ = [
     [0, 0, 0],
     [0, 0, 0],
@@ -31,10 +38,11 @@ const projection = [
     [0, 1, 0],
 ];
 function setup() {
+    LoadX();
     CreateTheInputsBoxes();
     CreateTheInputs();
     let SizeOfCanvas = [700, 700];
-    let PositonOfCanvas = [100, 400];
+    let PositonOfCanvas = [100, 425];
     createCanvas(SizeOfCanvas[0], SizeOfCanvas[1]).position(PositonOfCanvas[0], PositonOfCanvas[1]);
 }
 function draw(){
@@ -139,18 +147,44 @@ function draw(){
     rotationY[2][2] = rotationZ[0][0];
     strokeWeight(5);
     noFill();
-    stroke(255);
     let projected = [];
     let compensation = 300 / BiggestY;
-    for (let i = 0; i < y.length; i++) {
-        let rotated = matmul(rotationY, y[i]);
-        rotated = matmul(rotationX, rotated);
-        rotated = matmul(rotationZ, rotated);
-        let projected2d = matmul(projection, rotated);
-        projected[i] = [];
-        projected[i][0] = projected2d[0] * compensation + 350;
-        projected[i][1] = projected2d[1] * compensation + 350;
-        point((projected[i][0]), (projected[i][1]));
+    if (ColorMode == 0){
+        stroke(255);
+        for (let i = 0; i < y.length; i++) {
+            let rotated = matmul(rotationY, y[i]);
+            rotated = matmul(rotationX, rotated);
+            rotated = matmul(rotationZ, rotated);
+            let projected2d = matmul(projection, rotated);
+            projected[i] = [];
+            projected[i][0] = projected2d[0] * compensation + 350;
+            projected[i][1] = projected2d[1] * compensation + 350;
+            point((projected[i][0]), (projected[i][1]));
+        }
+    }else if(ColorMode == 1){
+        for (let i = 0; i < y.length; i++) {
+            let rotated = matmul(rotationY, y[i]);
+            rotated = matmul(rotationX, rotated);
+            rotated = matmul(rotationZ, rotated);
+            let projected2d = matmul(projection, rotated);
+            projected[i] = [];
+            projected[i][0] = projected2d[0] * compensation + 350;
+            projected[i][1] = projected2d[1] * compensation + 350;
+            stroke(Colors[i]);
+            point((projected[i][0]), (projected[i][1]));
+        }
+    }else{
+        for (let i = 0; i < y.length; i++) {
+            let rotated = matmul(rotationY, y[i]);
+            rotated = matmul(rotationX, rotated);
+            rotated = matmul(rotationZ, rotated);
+            let projected2d = matmul(projection, rotated);
+            projected[i] = [];
+            projected[i][0] = projected2d[0] * compensation + 350;
+            projected[i][1] = projected2d[1] * compensation + 350;
+            stroke(Colors[i][0],Colors[i][1],Colors[i][2]);
+            point((projected[i][0]), (projected[i][1]));
+        }
     }
     if (mouseX > 0 && mouseX < 700 && mouseY > 0 && mouseY < 700){
         let iPressed = null;
@@ -165,10 +199,10 @@ function draw(){
             stroke(255,0,90);
             strokeWeight(10);
             point(projected[iPressed][0], projected[iPressed][1]);
-            pop();
             push();
             textSize(30);
             strokeWeight(1);
+            stroke(255);
             if (typeof Labels != 'undefined'){
                 text(Labels[iPressed], 50, 50, 50, 50);
             }else{text(iPressed,50, 50, 50, 50)}
@@ -253,22 +287,50 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
         OctTree = new OctTreeElement([0,0,0], BiggestY);
         OctTree.InsertInBoxes(y, IndexElements);
         BiggestY = 0;
-        for(let i = 0; i <= numberOfSamplesInX - 2; i++){
-            for(let z = 0; z <= VantagePointQueryArray[i].length - 1; z++){
-                j = VantagePointQueryArray[i][z] - i - 1;
-                if(j <= numberOfSamplesInX - i - 2 && j > 0){
-                    aux1=p[i][z] * CalculateZQij( i, j + i + 1);
-                    aux = aux1 * (y[i][0] - y[j+ i + 1][0]);
-                    Fattr[i][0] = Fattr[i][0] + aux;
-                    Fattr[j + i + 1][0] = Fattr[j + i + 1][0] - aux;
-                    aux = aux1 * (y[i][1] - y[j+ i + 1][1]);
-                    Fattr[i][1] = Fattr[i][1] + aux;
-                    Fattr[j + i + 1][1] = Fattr[j + i + 1][1] - aux;
-                    aux = aux1 * (y[i][2] - y[j+ i + 1][2]);
-                    Fattr[i][2] = Fattr[i][2] + aux;
-                    Fattr[j + i + 1][2] = Fattr[j + i + 1][2] - aux;
+        if (EarlyExageration.DidIFinish){
+            for(let i = 0; i <= numberOfSamplesInX - 2; i++){
+                for(let z = 0; z <= VantagePointQueryArray[i].length - 1; z++){
+                    j = VantagePointQueryArray[i][z] - i - 1;
+                    if(j <= numberOfSamplesInX - i - 2 && j > 0){
+                        aux1=p[i][z] * CalculateZQij( i, j + i + 1);
+                        aux = aux1 * (y[i][0] - y[j+ i + 1][0]);
+                        Fattr[i][0] = Fattr[i][0] + aux;
+                        Fattr[j + i + 1][0] = Fattr[j + i + 1][0] - aux;
+                        aux = aux1 * (y[i][1] - y[j+ i + 1][1]);
+                        Fattr[i][1] = Fattr[i][1] + aux;
+                        Fattr[j + i + 1][1] = Fattr[j + i + 1][1] - aux;
+                        aux = aux1 * (y[i][2] - y[j+ i + 1][2]);
+                        Fattr[i][2] = Fattr[i][2] + aux;
+                        Fattr[j + i + 1][2] = Fattr[j + i + 1][2] - aux;
+                    }
                 }
             }
+        }else{
+            for(let i = 0; i <= numberOfSamplesInX - 2; i++){
+                for(let z = 0; z <= VantagePointQueryArray[i].length - 1; z++){
+                    j = VantagePointQueryArray[i][z] - i - 1;
+                    if(j <= numberOfSamplesInX - i - 2 && j > 0){
+                        aux1= EarlyExageration.Factor * p[i][z] * CalculateZQij( i, j + i + 1);
+                        aux = aux1 * (y[i][0] - y[j+ i + 1][0]);
+                        Fattr[i][0] = Fattr[i][0] + aux;
+                        Fattr[j + i + 1][0] = Fattr[j + i + 1][0] - aux;
+                        aux = aux1 * (y[i][1] - y[j+ i + 1][1]);
+                        Fattr[i][1] = Fattr[i][1] + aux;
+                        Fattr[j + i + 1][1] = Fattr[j + i + 1][1] - aux;
+                        aux = aux1 * (y[i][2] - y[j+ i + 1][2]);
+                        Fattr[i][2] = Fattr[i][2] + aux;
+                        Fattr[j + i + 1][2] = Fattr[j + i + 1][2] - aux;
+                    }
+                }
+            }
+            push();
+            stroke(150);
+            textSize(20);
+            strokeWeight(1);
+            text('Early Exageration Active', 470, 10, 250, 50);
+            pop();
+            EarlyExageration.Counter = EarlyExageration.Counter + 1;
+            if (EarlyExageration.Counter > EarlyExageration.Iterations){EarlyExageration.DidIFinish = true}
         }
         for(let i = 0; i <= numberOfSamplesInX - 2; i++){
             OctTree.ListOfEquivalentBodiesOfI(y, i, TradeOff, ResultOT);

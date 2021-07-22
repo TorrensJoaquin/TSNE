@@ -4,23 +4,34 @@ function CreateTheInputs(){
     let SizeOfInput=[60,20];
     inpPerplexity=createInput((3).toString());
     inpPerplexity.size(SizeOfInput[0],SizeOfInput[1]);
-    inpPerplexity.position(375,20);
+    inpPerplexity.position(370,39);
     inpPerplexity.input(myInputPerplexity);
-
-    inpTradeOff=createInput((0.5).toString());
-    inpTradeOff.size(SizeOfInput[0],SizeOfInput[1]);
-    inpTradeOff.position(375,50);
-    inpTradeOff.input(myInputTradeOff);
 
     inpLearningRatio=createInput((3).toString());
     inpLearningRatio.size(SizeOfInput[0],SizeOfInput[1]);
-    inpLearningRatio.position(705,20);
+    inpLearningRatio.position(626,25);
     inpLearningRatio.input(myInputLearningRatio);
 
     inpMomentum=createInput((0.3).toString());
     inpMomentum.size(SizeOfInput[0],SizeOfInput[1]);
-    inpMomentum.position(705,50);
+    inpMomentum.position(626,52);
     inpMomentum.input(myInputMomentum);
+
+    inpTradeOff=createInput((0.5).toString());
+    inpTradeOff.size(SizeOfInput[0],SizeOfInput[1]);
+    inpTradeOff.position(810,39);
+    inpTradeOff.input(myInputTradeOff);
+
+    inpEarlyExaggerationIterations=createInput((250).toString());
+    inpEarlyExaggerationIterations.size(SizeOfInput[0],SizeOfInput[1]);
+    inpEarlyExaggerationIterations.position(1007,25);
+    inpEarlyExaggerationIterations.input(myInputEarlyExaggerationIterations);
+
+    inpEarlyExaggerationFactor=createInput((4).toString());
+    inpEarlyExaggerationFactor.size(SizeOfInput[0],SizeOfInput[1]);
+    inpEarlyExaggerationFactor.position(1007,52);
+    inpEarlyExaggerationFactor.input(myInputEarlyExaggerationFactor);
+
     function myInputPerplexity(){
         DesiredPerplexity = UpdateComponent(inpPerplexity);
         TradeOff = UpdateComponent(inpTradeOff);
@@ -36,6 +47,12 @@ function CreateTheInputs(){
     }
     function myInputMomentum(){
         Momentum = UpdateComponent(inpMomentum);
+    }
+    function myInputEarlyExaggerationIterations(){
+        EarlyExageration.Iterations = UpdateComponent(EarlyExaggerationIterations);
+    }
+    function myInputEarlyExaggerationFactor(){
+        EarlyExageration.Factor = UpdateComponent(EarlyExaggerationFactor);
     }
 }
 function UpdateComponent(ComponentOfDOM){
