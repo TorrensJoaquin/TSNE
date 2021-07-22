@@ -7,8 +7,8 @@ let p = [];
 let y = [];
 let oldy = [];
 let numberOfSamplesInX;
-let Maximum;
 let angle = 0;
+let BiggestY;
 let shouldIStartAllOverAgain = true;
 let shouldIStartReInitializeY = true;
 let rotationZ = [
@@ -125,12 +125,6 @@ function draw(){
         shouldIStartAllOverAgain = false;
     }
     YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, LearningRatio, VantagePointQueryArray, TradeOff);
-    Maximum = 0;
-    for(let i = 0; i < X.length; i++){
-        if(Math.abs(y[i][0])>Maximum){Maximum = Math.abs(y[i][0])}
-        if(Math.abs(y[i][1])>Maximum){Maximum = Math.abs(y[i][1])}
-        if(Math.abs(y[i][2])>Maximum){Maximum = Math.abs(y[i][2])}
-    }
     rotationZ[0][0]=cos(angle);
     rotationZ[1][0]=sin(angle);
     rotationZ[0][1]=-rotationZ[1][0];
@@ -147,7 +141,7 @@ function draw(){
     noFill();
     stroke(255);
     let projected = [];
-    let compensation = 300 / Maximum;
+    let compensation = 300 / BiggestY;
     for (let i = 0; i < y.length; i++) {
         let rotated = matmul(rotationY, y[i]);
         rotated = matmul(rotationX, rotated);
@@ -247,7 +241,6 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
     let aux;
     let aux1;
     let j;
-    let BiggestY = 2;
     let IndexElements=[];
     let ResultOT = new OctTreeResults();
     for(let i = 0; i < y.length; i++){
