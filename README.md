@@ -14,6 +14,5 @@ I'm not going to be able to see your information. Everything is happening on you
 
 ### Coming Soon  
 Option to load the colors of the dots in the 3D representation.  
-PCA initialization.  
 Early Exaggeration.  
 TSNE wizard.(choosing the best parameters for you)  
