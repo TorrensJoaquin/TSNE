@@ -8,7 +8,7 @@ let y = [];
 let oldy = [];
 let numberOfSamplesInX;
 let angle = 0;
-let BiggestY;
+let BiggestY = 2;
 let shouldIStartAllOverAgain = true;
 let shouldIStartReInitializeY = true;
 let rotationZ = [
