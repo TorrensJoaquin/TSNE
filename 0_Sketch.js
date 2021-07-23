@@ -327,7 +327,7 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
             stroke(150);
             textSize(20);
             strokeWeight(1);
-            text('Early Exageration Active', 470, 10, 250, 50);
+            text('Early Exaggeration Active', 470, 10, 250, 50);
             pop();
             EarlyExageration.Counter = EarlyExageration.Counter + 1;
             if (EarlyExageration.Counter > EarlyExageration.Iterations){EarlyExageration.DidIFinish = true}
