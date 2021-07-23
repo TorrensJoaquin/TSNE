@@ -23,8 +23,8 @@ function InputIsActivated1(){
     shouldIStartAllOverAgain = true;
     shouldIStartReInitializeY = true;
     Momentum = UpdateComponent(inpMomentum);
-    EarlyExageration.DidIFinish = false;
-    EarlyExageration.Counter = 0;
+    EarlyExaggeration.DidIFinish = false;
+    EarlyExaggeration.Counter = 0;
     ColorMode = 0;
 }
 function InputIsActivated2(){

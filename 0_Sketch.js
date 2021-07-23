@@ -12,7 +12,7 @@ let BiggestY = 2;
 let shouldIStartAllOverAgain = true;
 let shouldIStartReInitializeY = true;
 let ColorMode = 2;
-let EarlyExageration ={
+let EarlyExaggeration ={
     DidIFinish : false,
     Counter : 0,
     Iterations : 250,
@@ -287,7 +287,7 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
         OctTree = new OctTreeElement([0,0,0], BiggestY);
         OctTree.InsertInBoxes(y, IndexElements);
         BiggestY = 0;
-        if (EarlyExageration.DidIFinish){
+        if (EarlyExaggeration.DidIFinish){
             for(let i = 0; i <= numberOfSamplesInX - 2; i++){
                 for(let z = 0; z <= VantagePointQueryArray[i].length - 1; z++){
                     j = VantagePointQueryArray[i][z] - i - 1;
@@ -310,7 +310,7 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
                 for(let z = 0; z <= VantagePointQueryArray[i].length - 1; z++){
                     j = VantagePointQueryArray[i][z] - i - 1;
                     if(j <= numberOfSamplesInX - i - 2 && j > 0){
-                        aux1= EarlyExageration.Factor * p[i][z] * CalculateZQij( i, j + i + 1);
+                        aux1= EarlyExaggeration.Factor * p[i][z] * CalculateZQij( i, j + i + 1);
                         aux = aux1 * (y[i][0] - y[j+ i + 1][0]);
                         Fattr[i][0] = Fattr[i][0] + aux;
                         Fattr[j + i + 1][0] = Fattr[j + i + 1][0] - aux;
@@ -329,8 +329,8 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
             strokeWeight(1);
             text('Early Exaggeration Active', 470, 10, 250, 50);
             pop();
-            EarlyExageration.Counter = EarlyExageration.Counter + 1;
-            if (EarlyExageration.Counter > EarlyExageration.Iterations){EarlyExageration.DidIFinish = true}
+            EarlyExaggeration.Counter = EarlyExaggeration.Counter + 1;
+            if (EarlyExaggeration.Counter > EarlyExaggeration.Iterations){EarlyExaggeration.DidIFinish = true}
         }
         for(let i = 0; i <= numberOfSamplesInX - 2; i++){
             OctTree.ListOfEquivalentBodiesOfI(y, i, TradeOff, ResultOT);
