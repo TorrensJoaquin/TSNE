@@ -11,7 +11,7 @@ let angle = 0;
 let BiggestY = 2;
 let shouldIStartAllOverAgain = true;
 let shouldIStartReInitializeY = true;
-let ColorMode = 2;
+let ColorMode;
 let EarlyExaggeration ={
     DidIFinish : false,
     Counter : 0,
@@ -38,7 +38,7 @@ const projection = [
     [0, 1, 0],
 ];
 function setup() {
-    LoadX();
+    LoadX(Math.floor(Math.random()*3));
     CreateTheInputsBoxes();
     CreateTheInputs();
     let SizeOfCanvas = [700, 700];
