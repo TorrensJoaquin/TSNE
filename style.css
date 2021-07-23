@@ -1,7 +1,7 @@
 html, body {
     margin: 0;
     padding: 0;
-    color: rgb(203, 255, 255);
+    background-color: rgb(203, 255, 255);
     background-image: url('Background.png');
     background-repeat: no-repeat;
 }
