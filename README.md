@@ -14,3 +14,4 @@ I'm not going to be able to see your information. Everything is happening on you
 
 ### Coming Soon  
 TSNE wizard.(Choosing the best parameters for you)  
+PCA for PreReduction of the dimensionality for large datasets.  
