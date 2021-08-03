@@ -49,10 +49,10 @@ function CreateTheInputs(){
         Momentum = UpdateComponent(inpMomentum);
     }
     function myInputEarlyExaggerationIterations(){
-        EarlyExaggeration.Iterations = UpdateComponent(EarlyExaggerationIterations);
+        EarlyExaggeration.Iterations = UpdateComponent(inpEarlyExaggerationIterations);
     }
     function myInputEarlyExaggerationFactor(){
-        EarlyExaggeration.Factor = UpdateComponent(EarlyExaggerationFactor);
+        EarlyExaggeration.Factor = UpdateComponent(inpEarlyExaggerationFactor);
     }
 }
 function UpdateComponent(ComponentOfDOM){
