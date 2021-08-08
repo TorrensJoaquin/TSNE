@@ -336,7 +336,7 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
             OctTree.ListOfEquivalentBodiesOfI(y, i, TradeOff, ResultOT);
             for(let z = 0; z <= ResultOT.ResultOfTheQueryOT1.length - 1; z++){
                 aux = CalculateZQij2( i, ResultOT.ResultOfTheQueryOT1[z]);
-                Sumq = Sumq + ResultOT.ResultOfTheQueryOT2[z] * 2 / aux;
+                Sumq = Sumq + ResultOT.ResultOfTheQueryOT2[z] / aux;
                 aux1 = Math.pow(aux, 2);
                 aux = aux1 * (y[i][0] - ResultOT.ResultOfTheQueryOT1[z][0] * ResultOT.ResultOfTheQueryOT2[z])
                 Frep[i][0] = Frep[i][0] - aux;
