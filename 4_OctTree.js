@@ -2,9 +2,9 @@ let OctTreeElementCapacity = 3;
 let OctTreeMaximumInception = 8;
 class OctTreeResults{
     constructor(){
-        this.ResultOfTheQueryOT1 = [];
-        this.ResultOfTheQueryOT2 = [];
-        this.ResultOfTheQueryOT3 = [];
+        this.ResultOfTheQueryOT1 = []; //Center of mass of the elemnt in octree
+        this.ResultOfTheQueryOT2 = []; //Amount of elements inside that octree
+        this.ResultOfTheQueryOT3 = []; //Index that should be checked individualy
     }
 }
 class OctTreeElement{
