@@ -347,7 +347,7 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
             }
             for(let z = 0; z <= ResultOT.ResultOfTheQueryOT3.length - 1; z++){
                 aux = CalculateZQij( i, ResultOT.ResultOfTheQueryOT3[z]);
-                Sumq = Sumq +  2 / aux;
+                Sumq = Sumq +  1 / aux;
                 aux1 = Math.pow(aux, 2);
                 aux = aux1 * (y[i][0] - y[ResultOT.ResultOfTheQueryOT3[z]][0]);
                 Frep[i][0] = Frep[i][0] - aux;
