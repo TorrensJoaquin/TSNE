@@ -2,9 +2,9 @@ let QuadTreeElementCapacity = 3;
 let QuadTreeMaximumInception = 8;
 class QuadTreeResults{
     constructor(){
-        this.ResultOfTheQueryOT1 = [];
-        this.ResultOfTheQueryOT2 = [];
-        this.ResultOfTheQueryOT3 = [];
+        this.ResultOfTheQueryOT1 = []; //Center of mass of the elemnt on quadtree.
+        this.ResultOfTheQueryOT2 = []; //Amount of elements inside that quadtree.
+        this.ResultOfTheQueryOT3 = []; //Index that should be checked individualy.
     }
 }
 class QuadtreeElement{
