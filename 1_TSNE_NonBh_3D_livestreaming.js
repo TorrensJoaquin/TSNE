@@ -9,15 +9,36 @@ let numberOfSamplesInX;
 let Maximum = -100;
 let Minimum = 100;
 let RangeX = 0;
+let BiggestY = 2;
 let numberOfDimentionsInLowDimensionalSpace = 3;
 let angle = 0;
 let points = [];
+let rotationZ = [
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 1],
+];
+let rotationX = [
+    [1, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0],
+];
+let rotationY = [
+    [0, 0, 0],
+    [0, 1, 0],
+    [0, 0, 0],
+];
 const projection = [
     [1, 0, 0],
     [0, 1, 0],
 ];
 function setup() {
-    createCanvas(400, 400);
+    LoadX(Math.floor(Math.random()*3));
+    CreateTheInputsBoxes();
+    CreateTheInputs();
+    let SizeOfCanvas = [700, 700];
+    let PositonOfCanvas = [100, 425];
+    createCanvas(SizeOfCanvas[0], SizeOfCanvas[1]).position(PositonOfCanvas[0], PositonOfCanvas[1]);
     LearningRatio = LearningRatio * 4; //By definition of dydt ... It doesn't make sense using the *4 inside the loop
     numberOfSamplesInX = X.length;
     let numberOfDimentions = X[1].length;
@@ -52,43 +73,83 @@ function setup() {
 function draw() {
     background(0);
     YUpload(p, y, oldy, numberOfSamplesInX, numberOfDimentionsInLowDimensionalSpace, numberOfIterations, Momentum, LearningRatio);
-    for(let i = 0; i < y.length; i++){
-        points[i] = createVector(y[i][0]/5, y[i][1]/5, y[i][2]/5);
-    }
-    translate(width / 2, height / 2);
-    const rotationZ = [
-        [cos(angle), -sin(angle), 0],
-        [sin(angle), cos(angle), 0],
-        [0, 0, 1],
-    ];
-    const rotationX = [
-        [1, 0, 0],
-        [0, cos(angle), -sin(angle)],
-        [0, sin(angle), cos(angle)],
-    ];
-    const rotationY = [
-        [cos(angle), 0, sin(angle)],
-        [0, 1, 0],
-        [-sin(angle), 0, cos(angle)],
-    ];
+    rotationZ[0][0]=cos(angle);
+    rotationZ[1][0]=sin(angle);
+    rotationZ[0][1]=-rotationZ[1][0];
+    rotationZ[1][1]=rotationZ[0][0];
+    rotationX[1][1]=rotationZ[0][0];
+    rotationX[1][2]=rotationZ[0][1];
+    rotationX[2][1]=rotationZ[1][0];
+    rotationX[2][2]=rotationZ[0][0];
+    rotationY[0][0] = rotationZ[0][0];
+    rotationY[0][2] = rotationZ[1][0];
+    rotationY[2][0] = rotationZ[0][1];
+    rotationY[2][2] = rotationZ[0][0];
+    strokeWeight(5);
+    noFill();
     let projected = [];
-    for (let i = 0; i < points.length; i++) {
-        let rotated = matmul(rotationY, points[i]);
-        rotated = matmul(rotationX, rotated);
-        rotated = matmul(rotationZ, rotated);
-        let projected2d = matmul(projection, rotated);
-        projected2d.mult(200);
-        projected[i] = projected2d;
-        //point(projected2d.x, projected2d.y);
-    }
-    for (let i = 0; i < projected.length; i++) {
-        strokeWeight(5);
-        noFill();
-        const v = projected[i];
+    let compensation = 300 / BiggestY;
+    if (ColorMode == 0){
         stroke(255);
-        point(v.x, v.y);
+        for (let i = 0; i < y.length; i++) {
+            let rotated = matmul(rotationY, y[i]);
+            rotated = matmul(rotationX, rotated);
+            rotated = matmul(rotationZ, rotated);
+            let projected2d = matmul(projection, rotated);
+            projected[i] = [];
+            projected[i][0] = projected2d[0] * compensation + 350;
+            projected[i][1] = projected2d[1] * compensation + 350;
+            point((projected[i][0]), (projected[i][1]));
+        }
+    }else if(ColorMode == 1){
+        for (let i = 0; i < y.length; i++) {
+            let rotated = matmul(rotationY, y[i]);
+            rotated = matmul(rotationX, rotated);
+            rotated = matmul(rotationZ, rotated);
+            let projected2d = matmul(projection, rotated);
+            projected[i] = [];
+            projected[i][0] = projected2d[0] * compensation + 350;
+            projected[i][1] = projected2d[1] * compensation + 350;
+            stroke(Colors[i]);
+            point((projected[i][0]), (projected[i][1]));
+        }
+    }else{
+        for (let i = 0; i < y.length; i++) {
+            let rotated = matmul(rotationY, y[i]);
+            rotated = matmul(rotationX, rotated);
+            rotated = matmul(rotationZ, rotated);
+            let projected2d = matmul(projection, rotated);
+            projected[i] = [];
+            projected[i][0] = projected2d[0] * compensation + 350;
+            projected[i][1] = projected2d[1] * compensation + 350;
+            stroke(Colors[i][0],Colors[i][1],Colors[i][2]);
+            point((projected[i][0]), (projected[i][1]));
+        }
     }
-    angle += 0.005;
+    if (mouseX > 0 && mouseX < 700 && mouseY > 0 && mouseY < 700){
+        let iPressed = null;
+        for (let i = 0; i < projected.length; i++) {
+            if(Math.abs(projected[i][0] - mouseX) < 5 && Math.abs(projected[i][1] - mouseY) < 5){
+                iPressed = i;
+                i = projected.length;
+            }
+        }
+        if (iPressed != null){
+            push();
+            stroke(255,0,90);
+            strokeWeight(10);
+            point(projected[iPressed][0], projected[iPressed][1]);
+            push();
+            textSize(30);
+            strokeWeight(1);
+            stroke(255);
+            if (typeof Labels != 'undefined'){
+                text(Labels[iPressed], 50, 50, 50, 50);
+            }else{text(iPressed,50, 50, 50, 50)}
+            pop();
+        }
+        angle += 0.0005;
+    }else{angle += 0.005;}
 }
 function getMeThePairWiseAffinities1(X, numberOfSamplesInX, numberOfDimentions){
     //This is the part of the code that is independant of minusTwoSigmaSquared.
@@ -230,6 +291,7 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfDimentionsInLowDimensio
                 aux = y[i][n];
                 y[i][n] = y[i][n] - LearningRatio * dCdYi[i][n] + Momentum * (y[i][n] - oldy[i][n]);
                 oldy[i][n] = aux;
+                if(BiggestY < Math.abs(y[i][n])){BiggestY = Math.abs(y[i][n])}
             }
         }
     }
@@ -249,4 +311,30 @@ function zeros(dimensions){
         array.push(dimensions.length == 1 ? 0 : zeros(dimensions.slice(1)));
     }
     return array;
+}
+function matmul(a, b) {
+    let m = [];
+    m[0] = [];
+    m[1] = [];
+    m[2] = [];
+    m[0][0] = b[0];
+    m[1][0] = b[1];
+    m[2][0] = b[2];
+  
+    let colsA = a[0].length;
+    let rowsA = a.length;
+    let colsB = m[0].length;
+  
+    result = [];
+    for (let j = 0; j < rowsA; j++) {
+      result[j] = [];
+      for (let i = 0; i < colsB; i++) {
+        let sum = 0;
+        for (let n = 0; n < colsA; n++) {
+          sum += a[j][n] * m[n][i];
+        }
+        result[j][i] = sum;
+      }
+    }
+    return result;
 }
