@@ -4,6 +4,7 @@ let LearningRatio = 3;
 let Momentum = 0.3;
 let TradeOff = 0.5;
 let p = [];
+let p2 = [];
 let y = [];
 let oldy = [];
 let numberOfSamplesInX;
@@ -58,7 +59,8 @@ function draw(){
         let middle2 = Array(numberOfSamplesInX).fill(0);
         let bottom1 = Array(numberOfSamplesInX).fill(0);
         let bottom2 = Array(numberOfSamplesInX).fill(0);
-        p = []; //pj|i
+        p = []; //pj|i upper
+        p2 = []; //pj|i lower
         let aux;
         //
         let IndexElements=[];
@@ -68,6 +70,7 @@ function draw(){
         let VantagePoint = new VantagePointElement();
         VantagePoint.SelectASeedAndFindMu(X, IndexElements);
         VantagePoint.SearchKNeighbors(X, numberOfSamplesInX, DesiredPerplexity);
+        delete VantagePoint;
         //
         for(let i = 0; i < numberOfSamplesInX; i++){
             top1[i] = -0.0001;
@@ -77,7 +80,7 @@ function draw(){
         aux = getMeThePairWiseAffinities1(X, numberOfSamplesInX, numberOfDimentions);
         for(let iter = 0; iter <= 100; iter++){
             IShouldStay = true;
-            p = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, top1);
+            [p, p2] = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, top1);
             top2 = GetMeThePerplexity(p, numberOfSamplesInX);
             for(let i = 0; i <= numberOfSamplesInX - 1; i++){
                 if(top2[i] < DesiredPerplexity){
@@ -91,7 +94,7 @@ function draw(){
         for(let i = 0; i <= numberOfSamplesInX - 1; i++){
             middle1[i] = (top1[i] + bottom1[i]) / 2;
         }
-        p = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, middle1);
+        [p, p2] = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, middle1);
         middle2 = GetMeThePerplexity(p, numberOfSamplesInX);
         for(let iter = 0; iter <= 100; iter++){
         //Decision Maker (you can do better than this, see it later)
@@ -107,7 +110,7 @@ function draw(){
                     middle1[i] = (top1[i] + bottom1[i]) / 2;
                 }
             }
-            p = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, middle1);
+            [p, p2] = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, middle1);
             middle2 = GetMeThePerplexity(p, numberOfSamplesInX);
         }
         //Set pij= ( pj|i + pi|j ) / 2 * n
@@ -115,10 +118,11 @@ function draw(){
             for(let z = 0; z <= VantagePointQueryArray[i].length - 1; z++){
                 j = VantagePointQueryArray[i][z] - i - 1;
                 if(j <= numberOfSamplesInX - i - 2 && j > 0){
-                    p[i][z] = p[i][z] / numberOfSamplesInX;
+                    p[i][z] = (p[i][z] + p2[i][z]) / numberOfSamplesInX;
                 }
             }
         }
+        delete p2;
         //Sample Initial Solution Y
         if(shouldIStartReInitializeY){
             y=zeros2(numberOfSamplesInX);
@@ -231,15 +235,21 @@ function getMeThePairWiseAffinities1(X, numberOfSamplesInX, numberOfDimentions){
 function getMeThePairWiseAffinities2(auxiliar, numberOfSamplesInX, minusTwoSigmaSquared){
     // get the sum of pair wise affinities and the non normilized pair wise affinities
     let sumOfPairWiseAffinities = Array(numberOfSamplesInX).fill(0);
-    let p = Array(numberOfSamplesInX).fill(0); //pj|i
+    let p = Array(numberOfSamplesInX).fill(0); //pj|i upper
+    let p2 = Array(numberOfSamplesInX).fill(0); //pj|i lower
     for(let i = 0; i <= numberOfSamplesInX - 2; i++){
         p[i] = Array(VantagePointQueryArray[i].length).fill(0);
+        p2[i] = Array(VantagePointQueryArray[i].length).fill(0);
         for(let z = 0; z <= VantagePointQueryArray[i].length - 1; z++){
             j = VantagePointQueryArray[i][z] - i - 1;
             if(j <= numberOfSamplesInX - i - 2 && j > 0){
                 p[i][z] = Math.exp(auxiliar[i][z] / (minusTwoSigmaSquared[i] + 0.000001));
                 sumOfPairWiseAffinities[i] = sumOfPairWiseAffinities[i] + p[i][z];
                 sumOfPairWiseAffinities[j + i + 1] = sumOfPairWiseAffinities[j + i + 1] + p[i][z];
+            }else if(j != i){
+                p2[i][z] = Math.exp(auxiliar[i][z] / (minusTwoSigmaSquared[i] + 0.000001));
+                sumOfPairWiseAffinities[i] = sumOfPairWiseAffinities[i] + p[i][z];
+                sumOfPairWiseAffinities[j + i + 1] = sumOfPairWiseAffinities[j + i + 1] + p[i][z];                
             }
         }
     }
@@ -249,18 +259,25 @@ function getMeThePairWiseAffinities2(auxiliar, numberOfSamplesInX, minusTwoSigma
             j = VantagePointQueryArray[i][z] - i - 1;
             if(j <= numberOfSamplesInX - i - 2 && j > 0){
                 p[i][z] = p[i][z] / (sumOfPairWiseAffinities[j + i + 1] + 0.000001);
+            }else if(j != i){
+                p2[i][z] = p2[i][z] / (sumOfPairWiseAffinities[j + i + 1] + 0.000001);            
             }
         }
     }
-    return p;
+    return [p,p2];
 }
 function GetMeThePerplexity(p, numberOfSamplesInX){
     let Perplexities=Array(numberOfSamplesInX).fill(0);
     for(i = 0; i <= numberOfSamplesInX - 2; i++){
         for(let z = 0; z <= VantagePointQueryArray[i].length - 1; z++){
             j = VantagePointQueryArray[i][z] - i - 1;
+            let aux = 0;
             if(j <= numberOfSamplesInX - i - 2 && j > 0){
-                let aux = p[i][z] * Math.log2(p[i][z] + 0.001);
+                aux = p[i][z] * Math.log2(p[i][z] + 0.001);
+                Perplexities[i] = Perplexities[i] + aux;
+                Perplexities[j + i + 1] = Perplexities[j + i + 1] + aux;
+            }else if(j != i){
+                aux = p2[i][z] * Math.log2(p2[i][z] + 0.001);
                 Perplexities[i] = Perplexities[i] + aux;
                 Perplexities[j + i + 1] = Perplexities[j + i + 1] + aux;
             }
