@@ -60,7 +60,7 @@ function draw(){
             IShouldStay = true;
             p = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, top1);
             top2 = GetMeThePerplexity(p, numberOfSamplesInX);
-            for(let i = 0; i <= numberOfSamplesInX - 1; i++){
+            for(let i = 0; i < numberOfSamplesInX; i++){
                 if(top2[i] < DesiredPerplexity){
                     IShouldStay = false;
                     bottom1[i] = top1[i];
@@ -69,14 +69,14 @@ function draw(){
             }
             if(IShouldStay){iter = 101};
         }
-        for(let i = 0; i <= numberOfSamplesInX - 1; i++){
+        for(let i = 0; i < numberOfSamplesInX; i++){
             middle1[i] = (top1[i] + bottom1[i]) / 2;
         }
         p = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, middle1);
         middle2 = GetMeThePerplexity(p, numberOfSamplesInX);
         for(let iter = 0; iter <= 100; iter++){
             //Decision Maker (you can do better than this, see it later)
-            for(let i = 0; i <= numberOfSamplesInX - 1; i++){
+            for(let i = 0; i < numberOfSamplesInX; i++){
                 if(Math.abs(middle2[i] - DesiredPerplexity) < 0.01){
                 }else if(middle2[i] > DesiredPerplexity){
                     top1[i] = middle1[i];
@@ -113,7 +113,7 @@ function draw(){
         if(shouldIStartReInitializeY){
             y=zeros2(numberOfSamplesInX);
             oldy=zeros2(numberOfSamplesInX);
-            for(let i = 0; i <= numberOfSamplesInX - 2; i++){
+            for(let i = 0; i < numberOfSamplesInX; i++){
                 for(let n = 0; n < 2; n++){
                     y[i][n] = (Math.random()-0.5);
                 }
@@ -188,7 +188,7 @@ function getMeThePairWiseAffinities2(auxiliar, numberOfSamplesInX, minusTwoSigma
     let p = Array(numberOfSamplesInX).fill(0); //pj|i upper
     for(let i = 0; i < numberOfSamplesInX; i++){
         p[i] = Array(VantagePointQueryArray[i].length).fill(0);
-        for(let z = 0; z <= VantagePointQueryArray[i].length - 1; z++){
+        for(let z = 0; z < VantagePointQueryArray[i].length; z++){
             j = VantagePointQueryArray[i][z];
             if(j != i){
                 p[i][z] = Math.exp(auxiliar[i][z] / (minusTwoSigmaSquared[i] + 0.000001));
@@ -198,7 +198,7 @@ function getMeThePairWiseAffinities2(auxiliar, numberOfSamplesInX, minusTwoSigma
     }
     // get the normilized pair wise affinities
     for(let i = 0; i < numberOfSamplesInX; i++){
-        for(let z = 0; z <= VantagePointQueryArray[i].length - 1; z++){
+        for(let z = 0; z < VantagePointQueryArray[i].length; z++){
             j = VantagePointQueryArray[i][z];
             if(j != i){
                 p[i][z] = p[i][z] / (sumOfPairWiseAffinities[j] + 0.000001);            
@@ -209,7 +209,7 @@ function getMeThePairWiseAffinities2(auxiliar, numberOfSamplesInX, minusTwoSigma
 }
 function GetMeThePerplexity(p, numberOfSamplesInX){
     let Perplexities=Array(numberOfSamplesInX).fill(0);
-    for(i = 0; i <= numberOfSamplesInX - 2; i++){
+    for(i = 0; i < numberOfSamplesInX; i++){
         for(let z = 0; z < VantagePointQueryArray[i].length; z++){
             j = VantagePointQueryArray[i][z];
             let aux = 0;
@@ -241,8 +241,8 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
         QuadTree.InsertInBoxes(y, IndexElements);
         BiggestY = 0;
         if (EarlyExaggeration.DidIFinish){
-            for(let i = 0; i <= numberOfSamplesInX - 2; i++){
-                for(let z = 0; z <= VantagePointQueryArray[i].length - 1; z++){
+            for(let i = 0; i < numberOfSamplesInX; i++){
+                for(let z = 0; z < VantagePointQueryArray[i].length; z++){
                     j = VantagePointQueryArray[i][z];
                     if(j != i){
                         aux1=p[i][z] * CalculateZQij( i, j);
@@ -254,8 +254,8 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
                 }
             }
         }else{
-            for(let i = 0; i <= numberOfSamplesInX - 2; i++){
-                for(let z = 0; z <= VantagePointQueryArray[i].length - 1; z++){
+            for(let i = 0; i < numberOfSamplesInX; i++){
+                for(let z = 0; z < VantagePointQueryArray[i].length; z++){
                     j = VantagePointQueryArray[i][z];
                     if(j != i){
                         aux1= EarlyExaggeration.Factor * p[i][z] * CalculateZQij( i, j);
@@ -275,7 +275,7 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
             EarlyExaggeration.Counter = EarlyExaggeration.Counter + 1;
             if (EarlyExaggeration.Counter > EarlyExaggeration.Iterations){EarlyExaggeration.DidIFinish = true}
         }
-        for(let i = 0; i <= numberOfSamplesInX - 2; i++){
+        for(let i = 0; i < numberOfSamplesInX; i++){
             QuadTree.ListOfEquivalentBodiesOfI(y, i, TradeOff, ResultQT);
             for(let z = 0; z < ResultQT.ResultOfTheQueryQT1.length; z++){
                 aux = CalculateZQij2( i, ResultQT.ResultOfTheQueryQT1[z]);
@@ -297,7 +297,7 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
             }
         }
         //y adjustment
-        for(let i = 0; i <= numberOfSamplesInX - 1; i++){
+        for(let i = 0; i < numberOfSamplesInX; i++){
             aux = y[i][0];
             y[i][0] = y[i][0] - LearningRatio * (Fattr[i][0] + Frep[i][0] / Sumq) + Momentum * (y[i][0] - oldy[i][0]);
             oldy[i][0] = aux;
