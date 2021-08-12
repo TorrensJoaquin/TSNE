@@ -1,4 +1,4 @@
-let DesiredPerplexity = 3;
+let DesiredPerplexity = 5;
 let numberOfIterations = 1;
 let LearningRatio = 3;
 let Momentum = 0.3;
