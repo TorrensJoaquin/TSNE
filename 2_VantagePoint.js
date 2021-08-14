@@ -1,5 +1,5 @@
 let VantagePointElementCapacity = 1;
-let VantagePointMaximumInception =16;
+let VantagePointMaximumInception =18;
 let VantagePointQueryArray = Array(31).fill(0);
 let ResultOfTheQueryVP = [];
 let numberOfDimentions;
@@ -17,7 +17,7 @@ class VantagePointElement{
     }
     SearchKNeighbors(DataBase, numberOfSamplesInX, DesiredPerplexity){
         let threshold;
-        let RequestedNeighbors = DesiredPerplexity * 3;
+        let RequestedNeighbors = DesiredPerplexity * 1.5;
         for(let i = 0 ; i < numberOfSamplesInX; i++){
             threshold = 0.0001;
             for(let iter=0; iter < 100; iter++){
