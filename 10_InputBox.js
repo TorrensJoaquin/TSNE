@@ -32,11 +32,6 @@ function InputIsActivated2(){
         generateTable2(LabelsFromXLS.elt.value);
     };
 }
-function InputIsActivated2(){
-    if(LabelsFromXLS.elt.value != ''){
-        generateTable2(LabelsFromXLS.elt.value);
-    };
-}
 function InputIsActivated3(){
     if(ColorsFromXLS.elt.value != ''){
         generateTable3(ColorsFromXLS.elt.value);
