@@ -62,7 +62,7 @@ function generateTable1(data) {
         }
         NumberOfRows = data.length;    
     }
-    X=zeros([NumberOfRows - 1,NumberOfColumns - 1]);
+    X=zeros(NumberOfRows ,NumberOfColumns);
     for(let i=0; i < NumberOfRows; i++){
         for(let j=0; j < NumberOfColumns; j++){
             X[i][j]=parseFloat(data[i][j]);
@@ -109,7 +109,7 @@ function generateTable3(data) {
         }
         NumberOfRows = data.length;    
     }
-    Colors=zeros([NumberOfRows - 1,NumberOfColumns - 1]);
+    Colors=zeros( NumberOfRows, NumberOfColumns);
     for(let i=0; i < NumberOfRows; i++){
         for(let j=0; j < NumberOfColumns; j++){
             Colors[i][j]=parseFloat(data[i][j]);
