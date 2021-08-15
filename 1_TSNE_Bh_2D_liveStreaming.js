@@ -111,7 +111,7 @@ function draw(){
         delete p2;
         //Sample Initial Solution Y
         if(shouldIStartReInitializeY){
-            oldy=zeros2(numberOfSamplesInX);
+            oldy=zeros(numberOfSamplesInX,2);
             y = CreateAGaussianRandomMatrix(numberOfSamplesInX, 2);
         }
         shouldIStartReInitializeY = false;
@@ -229,8 +229,8 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
         IndexElements[i] = i;
     }
     for(let iter = 0; iter <= numberOfIterations; iter++){
-        let Fattr = zeros2(numberOfSamplesInX);
-        let Frep = zeros2(numberOfSamplesInX);
+        let Fattr = zeros(numberOfSamplesInX,2);
+        let Frep = zeros(numberOfSamplesInX,2);
         let Sumq = 0;
         QuadTree = new QuadtreeElement([0,0,0], BiggestY);
         QuadTree.InsertInBoxes(y, IndexElements);
@@ -328,17 +328,10 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
         return aux;
     }
 }
-function zeros(dimensions){
-    var array = [];
-    for (var i = 0; i <= dimensions[0]; ++i) {
-        array.push(dimensions.length == 1 ? 0 : zeros(dimensions.slice(1)));
-    }
-    return array;
-}
-function zeros2(dimensions){
-    var array = Array(dimensions);
-    for (var i = 0; i < dimensions; ++i) {
-        array[i] = Array(2).fill(0);
+function zeros(DimensionA, DimensionB){
+    let array = Array(DimensionA);
+    for (let i = 0; i < DimensionA; ++i) {
+        array[i] = Array(DimensionB).fill(0);
     }
     return array;
 }
