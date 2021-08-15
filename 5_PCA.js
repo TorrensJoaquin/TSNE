@@ -32,7 +32,7 @@ function PerformPCA(A, LowDimension, LowerDimensionalApproximation){
         }
     }
     //Covariance Matrix
-    let C = zeros(mNew - 1, mNew - 1);
+    let C = zeros(mNew, mNew);
     for(let i = 0; i < mNew; i++){
         for(let j = 0; j < mNew; j ++){
             for(let k = 0; k < p; k++){
@@ -68,7 +68,7 @@ function PerformPCA(A, LowDimension, LowerDimensionalApproximation){
     R = createIdentity(mNew, mNew);
     R = fmMult(R, C); //Now R is E
     //Perform de Dimensionality Reduction
-    C = zeros(p - 1, LowDimension - 1);
+    C = zeros(p, LowDimension);
     for (let i = 0; i < p; i++){
         for(let j = 0; j < mNew; j++){
             for(let k = 0; k <= LowDimension - 1; k++){
@@ -79,9 +79,9 @@ function PerformPCA(A, LowDimension, LowerDimensionalApproximation){
     return C;
 }
 function createIdentity(mRows, nCols){
-    let A = zeros(mRows - 1, nCols - 1);
-    for(i = 0; i <= mRows - 1; i++){
-        for(j = 0;j <= nCols - 1; j++){
+    let A = zeros(mRows, nCols);
+    for(i = 0; i < mRows; i++){
+        for(j = 0;j < nCols; j++){
             if(i == j){
                 A[i][j] = 1;
             }else{
@@ -107,7 +107,7 @@ function fmMult(A, B){
     let m = A.length;
     let n = B[0].length;
     let p = A[0].length;
-    let C = zeros(m - 1,n - 1);
+    let C = zeros(m,n);
     for(i = 0; i < m; i++){
         for(j = 0; j < n; j++){
             for(k = 0; k < p; k++){
