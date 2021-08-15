@@ -48,6 +48,14 @@ function draw(){
     background(0);
     if (shouldIStartAllOverAgain == true){
         y = PerformPCA(X, 3, 10);
+        BiggestY = 0;
+        for(let i = 0; i < y.length; i++){
+            for(let j = 0; j < y[0].length; j++){
+                if(Math.abs(y[i][j]) > BiggestY){
+                    BiggestY = Math.abs(y[i][0]);
+                }
+            }
+        }
         shouldIStartReInitializeY = false;
         shouldIStartAllOverAgain = false;
     }
