@@ -1,15 +1,15 @@
 function CreateTheInputsBoxes(){
     InputFromXLS=select('#PasteData');
     InputFromXLS.input(InputIsActivated1);
-    InputFromXLS.position(120,300);
+    InputFromXLS.position(120,330);
 
     LabelsFromXLS=select('#PasteLabels');
     LabelsFromXLS.input(InputIsActivated2);
-    LabelsFromXLS.position(385,300);
+    LabelsFromXLS.position(385,330);
 
     ColorsFromXLS=select('#PasteColors');
     ColorsFromXLS.input(InputIsActivated3);
-    ColorsFromXLS.position(670,300);
+    ColorsFromXLS.position(670,330);
 }
 function InputIsActivated1(){
     X=[];
