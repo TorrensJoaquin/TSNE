@@ -1,0 +1,10 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    background-color: rgb(203, 255, 255);
+    background-image: url('Background_PCA.png');
+    background-repeat: no-repeat;
+}
+  canvas {
+    display: block;
+  }
