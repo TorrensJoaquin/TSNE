@@ -336,7 +336,7 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
             for(let z = 0; z < ResultOT.ResultOfTheQueryOT1.length; z++){
                 aux = CalculateZQij2( i, ResultOT.ResultOfTheQueryOT1[z]);
                 Sumq = Sumq + ResultOT.ResultOfTheQueryOT2[z] / aux;
-                aux1 = Math.pow(aux, 2);
+                aux1 = aux * aux;
                 aux = aux1 * (y[i][0] - ResultOT.ResultOfTheQueryOT1[z][0] * ResultOT.ResultOfTheQueryOT2[z])
                 Frep[i][0] = Frep[i][0] - aux;
                 aux = aux1 * (y[i][1] - ResultOT.ResultOfTheQueryOT1[z][1] * ResultOT.ResultOfTheQueryOT2[z])
@@ -347,7 +347,7 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
             for(let z = 0; z < ResultOT.ResultOfTheQueryOT3.length; z++){
                 aux = CalculateZQij( i, ResultOT.ResultOfTheQueryOT3[z]);
                 Sumq = Sumq +  1 / aux;
-                aux1 = Math.pow(aux, 2);
+                aux1 = aux * aux;
                 aux = aux1 * (y[i][0] - y[ResultOT.ResultOfTheQueryOT3[z]][0]);
                 Frep[i][0] = Frep[i][0] - aux;
                 aux = aux1 * (y[i][1] - y[ResultOT.ResultOfTheQueryOT3[z]][1]);
@@ -374,17 +374,23 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
     }
     function CalculateZQij( i, j){
         let aux=0;
-        aux = aux + Math.pow(y[i][0] - y[j][0], 2);
-        aux = aux + Math.pow(y[i][1] - y[j][1], 2);
-        aux = aux + Math.pow(y[i][2] - y[j][2], 2);
-        return Math.pow(1 + aux, -1);
+        let aux1 = y[i][0] - y[j][0];
+        aux = aux + aux1 * aux1;
+        aux1 = y[i][1] - y[j][1];
+        aux = aux + aux1 * aux1;
+        aux1 = y[i][2] - y[j][2];
+        aux = aux + aux1 * aux1;
+        return 1 / (1 + aux);
     }
     function CalculateZQij2( i, CenterOfMass){
         let aux=0;
-        aux = aux + Math.pow(y[i][0] - CenterOfMass[0], 2);
-        aux = aux + Math.pow(y[i][1] - CenterOfMass[1], 2);
-        aux = aux + Math.pow(y[i][2] - CenterOfMass[2], 2);
-        return Math.pow(1 + aux, -1);
+        let aux1 = y[i][0] - CenterOfMass[0];
+        aux = aux + aux1 * aux1;
+        aux1 = y[i][1] - CenterOfMass[1];
+        aux = aux + aux1 * aux1;
+        aux1 = y[i][2] - CenterOfMass[2];
+        aux = aux + aux1 * aux1;
+        return 1 / (1 + aux);
     }
 }
 function zeros( DimensionA, DimensionB){
