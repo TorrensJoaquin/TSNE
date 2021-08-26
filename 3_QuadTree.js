@@ -34,11 +34,12 @@ class QuadtreeElement{
         this.EquivalentBodies(DataBase, i, TradeOff, this.QuadtreeDRSon, this.ListOfIndexElementsDR, Result);
     }
     EquivalentBodies(DataBase, i, TradeOff, QuadTree, ListOfElements, Result){
-        let aux;
         if(typeof QuadTree != 'undefined'){
-            aux = Math.pow(DataBase[i][0]-QuadTree.CenterOfMass[0],2);
-            aux = aux + Math.pow(DataBase[i][1]-QuadTree.CenterOfMass[1],2);
-            aux = Math.pow(aux,0.5);
+            let aux1 = DataBase[i][0]-QuadTree.CenterOfMass[0]; 
+            let aux = aux1 * aux1;
+            aux1 = DataBase[i][1]-QuadTree.CenterOfMass[1];
+            aux = aux + aux1 * aux1;
+            aux = Math.sqrt(aux);
             if(QuadTree.Radius / aux < TradeOff){
                 Result.ResultOfTheQueryQT1.push(QuadTree.CenterOfMass);
                 Result.ResultOfTheQueryQT2.push(QuadTree.AmountOfElementsInMe);
