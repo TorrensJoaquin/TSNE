@@ -399,25 +399,14 @@ function zeros( DimensionA, DimensionB){
     return array;
 }
 function matmul(a, b) {
-    let m = [];
-    m[0] = [];
-    m[1] = [];
-    m[2] = [];
-    m[0][0] = b[0];
-    m[1][0] = b[1];
-    m[2][0] = b[2];
-  
-    let colsA = a[0].length;
     let rowsA = a.length;
-    let colsB = m[0].length;
-  
     result = [];
     for (let j = 0; j < rowsA; j++) {
       result[j] = [];
-      for (let i = 0; i < colsB; i++) {
+      for (let i = 0; i < 1; i++) {
         let sum = 0;
-        for (let n = 0; n < colsA; n++) {
-          sum += a[j][n] * m[n][i];
+        for (let n = 0; n < 3; n++) {
+          sum += a[j][n] * b[n];
         }
         result[j][i] = sum;
       }
