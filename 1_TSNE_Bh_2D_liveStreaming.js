@@ -305,14 +305,14 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
     }
     function CalculateZQij( i, j){
         let aux1 = y[i][0] - y[j][0];
-        let aux = aux + aux1 * aux1;
+        let aux = aux1 * aux1;
         aux1 = y[i][1] - y[j][1];
         aux = aux + aux1 * aux1;
         return 1/(1 + aux);
     }
     function CalculateZQij2( i, CenterOfMass){
         let aux1 = y[i][0] - CenterOfMass[0];
-        let aux = aux + aux1 * aux1;
+        let aux = aux1 * aux1;
         aux1 = y[i][1] - CenterOfMass[1];
         aux = aux + aux1 * aux1;
         return 1/(1 + aux);
