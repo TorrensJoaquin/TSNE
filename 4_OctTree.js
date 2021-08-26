@@ -46,12 +46,14 @@ class OctTreeElement{
         this.EquivalentBodies(DataBase, i, TradeOff, this.OctTreeDRFSon, this.ListOfIndexElementsDRF, Result);
     }
     EquivalentBodies(DataBase, i, TradeOff, OctTree, ListOfElements, Result){
-        let aux;
         if(typeof OctTree != 'undefined'){
-            aux = Math.pow(DataBase[i][0]-OctTree.CenterOfMass[0],2);
-            aux = aux + Math.pow(DataBase[i][1]-OctTree.CenterOfMass[1],2);
-            aux = aux + Math.pow(DataBase[i][2]-OctTree.CenterOfMass[2],2);
-            aux = Math.pow(aux,0.5);
+            let aux1 = DataBase[i][0]-OctTree.CenterOfMass[0];
+            let aux = aux1 * aux1;
+            aux1 = DataBase[i][1]-OctTree.CenterOfMass[1];
+            aux = aux + aux1 * aux1;
+            aux1 = DataBase[i][2]-OctTree.CenterOfMass[2];
+            aux = aux + aux1 * aux1;
+            aux = Math.sqrt(aux);
             if(OctTree.Radius / aux < TradeOff){
                 Result.ResultOfTheQueryOT1.push(OctTree.CenterOfMass);
                 Result.ResultOfTheQueryOT2.push(OctTree.AmountOfElementsInMe);
