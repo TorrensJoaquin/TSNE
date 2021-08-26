@@ -33,7 +33,7 @@ let rotationY = [
     [0, 1, 0],
     [0, 0, 0],
 ];
-const projection = [
+let projection = [
     [1, 0, 0],
     [0, 1, 0],
 ];
@@ -67,10 +67,10 @@ function draw(){
     rotationX[1][2]=rotationZ[0][1];
     rotationX[2][1]=rotationZ[1][0];
     rotationX[2][2]=rotationZ[0][0];
-    rotationY[0][0] = rotationZ[0][0];
-    rotationY[0][2] = rotationZ[1][0];
-    rotationY[2][0] = rotationZ[0][1];
-    rotationY[2][2] = rotationZ[0][0];
+    rotationY[0][0]=rotationZ[0][0];
+    rotationY[0][2]=rotationZ[1][0];
+    rotationY[2][0]=rotationZ[0][1];
+    rotationY[2][2]=rotationZ[0][0];
     strokeWeight(5);
     noFill();
     let projected = [];
@@ -145,25 +145,14 @@ function zeros( DimensionA, DimensionB){
     return array;
 }
 function matmul(a, b) {
-    let m = [];
-    m[0] = [];
-    m[1] = [];
-    m[2] = [];
-    m[0][0] = b[0];
-    m[1][0] = b[1];
-    m[2][0] = b[2];
-  
-    let colsA = a[0].length;
     let rowsA = a.length;
-    let colsB = m[0].length;
-  
     result = [];
-    for (let j = 0; j < rowsA; j++) {
+    for (let j = 0; j < rowsA; j++){
       result[j] = [];
-      for (let i = 0; i < colsB; i++) {
+      for (let i = 0; i < 1; i++){
         let sum = 0;
-        for (let n = 0; n < colsA; n++) {
-          sum += a[j][n] * m[n][i];
+        for (let n = 0; n < 3; n++){
+          sum += a[j][n] * b[n];
         }
         result[j][i] = sum;
       }
