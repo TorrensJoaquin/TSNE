@@ -33,7 +33,7 @@ let rotationY = [
     [0, 1, 0],
     [0, 0, 0],
 ];
-const projection = [
+let projection = [
     [1, 0, 0],
     [0, 1, 0],
 ];
@@ -147,17 +147,17 @@ function draw(){
     rotationX[1][2]=rotationZ[0][1];
     rotationX[2][1]=rotationZ[1][0];
     rotationX[2][2]=rotationZ[0][0];
-    rotationY[0][0] = rotationZ[0][0];
-    rotationY[0][2] = rotationZ[1][0];
-    rotationY[2][0] = rotationZ[0][1];
-    rotationY[2][2] = rotationZ[0][0];
+    rotationY[0][0]=rotationZ[0][0];
+    rotationY[0][2]=rotationZ[1][0];
+    rotationY[2][0]=rotationZ[0][1];
+    rotationY[2][2]=rotationZ[0][0];
     strokeWeight(5);
     noFill();
     let projected = [];
     let compensation = 300 / BiggestY;
     if (ColorMode == 0){
         stroke(255);
-        for (let i = 0; i < y.length; i++) {
+        for (let i = 0; i < y.length; i++){
             let rotated = matmul(rotationY, y[i]);
             rotated = matmul(rotationX, rotated);
             rotated = matmul(rotationZ, rotated);
@@ -221,13 +221,18 @@ function getMeThePairWiseAffinities1(X, numberOfSamplesInX, numberOfDimentions){
     //This is the part of the code that is independant of minusTwoSigmaSquared.
     //I can play this part of the code only once during the sigma search.
     let p = Array(numberOfSamplesInX).fill(0); //pj|i
-    for(let i = 0; i < numberOfSamplesInX; i++){
+    let aux = 0;
+    let i = 0;
+    let z = 0;
+    let n = 0;
+    for(i = 0; i < numberOfSamplesInX; i++){
         p[i] = Array(VantagePointQueryArray[i].length).fill(0);
-        for(let z = 0; z < VantagePointQueryArray[i].length; z++){
+        for(z = 0; z < VantagePointQueryArray[i].length; z++){
             j = VantagePointQueryArray[i][z];
             if(j != i){
-                for(let n = 0; n < numberOfDimentions; n++){
-                    p[i][z] = p[i][z] + Math.pow(X[i][n] - X[j][n], 2);
+                for(n = 0; n < numberOfDimentions; n++){
+                    aux = X[i][n] - X[j][n];
+                    p[i][z] = p[i][z] + aux * aux;
                 }
             }
         }
@@ -393,7 +398,7 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
 }
 function zeros( DimensionA, DimensionB){
     let array = Array(DimensionA);
-    for (let i = 0; i < DimensionA; ++i) {
+    for (let i = 0; i < DimensionA; ++i){
         array[i] = Array(DimensionB).fill(0);
     }
     return array;
@@ -401,11 +406,11 @@ function zeros( DimensionA, DimensionB){
 function matmul(a, b) {
     let rowsA = a.length;
     result = [];
-    for (let j = 0; j < rowsA; j++) {
+    for (let j = 0; j < rowsA; j++){
       result[j] = [];
-      for (let i = 0; i < 1; i++) {
+      for (let i = 0; i < 1; i++){
         let sum = 0;
-        for (let n = 0; n < 3; n++) {
+        for (let n = 0; n < 3; n++){
           sum += a[j][n] * b[n];
         }
         result[j][i] = sum;
