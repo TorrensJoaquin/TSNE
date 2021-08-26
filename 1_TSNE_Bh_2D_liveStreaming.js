@@ -275,7 +275,7 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
             for(let z = 0; z < ResultQT.ResultOfTheQueryQT1.length; z++){
                 aux = CalculateZQij2( i, ResultQT.ResultOfTheQueryQT1[z]);
                 Sumq = Sumq + ResultQT.ResultOfTheQueryQT2[z] / aux;
-                aux1 = Math.pow(aux, 2);
+                aux1 = aux * aux;
                 aux = aux1 * (y[i][0] - ResultQT.ResultOfTheQueryQT1[z][0] * ResultQT.ResultOfTheQueryQT2[z])
                 Frep[i][0] = Frep[i][0] - aux;
                 aux = aux1 * (y[i][1] - ResultQT.ResultOfTheQueryQT1[z][1] * ResultQT.ResultOfTheQueryQT2[z])
@@ -284,7 +284,7 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
             for(let z = 0; z < ResultQT.ResultOfTheQueryQT3.length; z++){
                 aux = CalculateZQij( i, ResultQT.ResultOfTheQueryQT3[z]);
                 Sumq = Sumq +  1 / aux;
-                aux1 = Math.pow(aux, 2);
+                aux1 = aux * aux;
                 aux = aux1 * (y[i][0] - y[ResultQT.ResultOfTheQueryQT3[z]][0]);
                 Frep[i][0] = Frep[i][0] - aux;
                 aux = aux1 * (y[i][1] - y[ResultQT.ResultOfTheQueryQT3[z]][1]);
@@ -304,16 +304,18 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
         }
     }
     function CalculateZQij( i, j){
-        let aux=0;
-        aux = aux + Math.pow(y[i][0] - y[j][0], 2);
-        aux = aux + Math.pow(y[i][1] - y[j][1], 2);
-        return Math.pow(1 + aux, -1);
+        let aux1 = y[i][0] - y[j][0];
+        let aux = aux + aux1 * aux1;
+        aux1 = y[i][1] - y[j][1];
+        aux = aux + aux1 * aux1;
+        return 1/(1 + aux);
     }
     function CalculateZQij2( i, CenterOfMass){
-        let aux=0;
-        aux = aux + Math.pow(y[i][0] - CenterOfMass[0], 2);
-        aux = aux + Math.pow(y[i][1] - CenterOfMass[1], 2);
-        return Math.pow(1 + aux, -1);
+        let aux1 = y[i][0] - CenterOfMass[0];
+        let aux = aux + aux1 * aux1;
+        aux1 = y[i][1] - CenterOfMass[1];
+        aux = aux + aux1 * aux1;
+        return 1/(1 + aux);
     }
     function CalculateZQijL1( i, j){
         let aux=0;
