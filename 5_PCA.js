@@ -24,7 +24,7 @@ function PerformPCA(A, LowDimension, LowerDimensionalApproximation){
         StandardDeviation = 0;
         for(let i = 0; i < p; i++){
             A[i][j] = A[i][j] - Average;
-            StandardDeviation = StandardDeviation + Math.pow(A[i][j], 2);
+            StandardDeviation = StandardDeviation + A[i][j] * A[i][j];
         }
         StandardDeviation = Math.sqrt(StandardDeviation / p);
         for(let i = 0; i < p; i++){
@@ -48,7 +48,7 @@ function PerformPCA(A, LowDimension, LowerDimensionalApproximation){
         for(let j = 0; j < mNew; j++){
             R[j][j] = 0;
             for(let i = 0; i < mNew; i++){
-                R[j][j] = R[j][j] + Math.pow(C[i][j], 2);
+                R[j][j] = R[j][j] + C[i][j] * C[i][j];
             }
             R[j][j] = Math.sqrt(R[j][j]);
             for(let i = 0; i < mNew; i++){
