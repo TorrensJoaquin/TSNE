@@ -45,7 +45,7 @@ class VantagePointElement{
         for(let i=0; i < numberOfDimentions; i++){
             this.DistanceToTheSample = this.DistanceToTheSample + Math.pow(DataBase[this.IndexOfSeed][i]-DataBase[Sample][i],2);
         }
-        this.DistanceToTheSample = Math.pow(this.DistanceToTheSample,0.5);
+        this.DistanceToTheSample = Math.sqrt(this.DistanceToTheSample);
         //If i am far away
         if(this.DistanceToTheSample > this.Mu + threshold){
             if(typeof this.OutsideVantagePointSon != 'undefined'){
@@ -106,7 +106,7 @@ class VantagePointElement{
                 for(let i=0; i < numberOfDimentions; i++){
                     aux[Sample] = aux[Sample] + Math.pow(DataBase[this.IndexOfSeed][i]-DataBase[IndexOfElementsToEvaluate[Sample]][i],2);
                 }
-                aux[Sample] = Math.pow(aux[Sample],0.5);
+                aux[Sample] = Math.sqrt(aux[Sample]);
                 if(aux[Sample] < MiddleMu){
                     CounterOfElementsInsideMe = CounterOfElementsInsideMe + 1;
                 }
@@ -124,7 +124,7 @@ class VantagePointElement{
             for(let i=0; i < numberOfDimentions; i++){
                 aux[Sample] = aux[Sample] + Math.pow(DataBase[this.IndexOfSeed][i]-DataBase[IndexOfElementsToEvaluate[Sample]][i],2);
             }
-            aux[Sample] = Math.pow(aux[Sample],0.5);
+            aux[Sample] = Math.sqrt(aux[Sample]);
         }
         for(let iter = 0; iter < ToleranceOfIteration; iter++){
             NonDefinitiveListOfIndexOutsideMe = [];
