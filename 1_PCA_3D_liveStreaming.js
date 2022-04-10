@@ -144,17 +144,16 @@ function zeros( DimensionA, DimensionB){
     }
     return array;
 }
-function matmul(a, b) {
+function matmul(a, b){
     let rowsA = a.length;
     result = [];
     for (let j = 0; j < rowsA; j++){
       result[j] = [];
       for (let i = 0; i < 1; i++){
-        let sum = 0;
+        result[j][i] = 0;
         for (let n = 0; n < 3; n++){
-          sum += a[j][n] * b[n];
+            result[j][i] += a[j][n] * b[n];
         }
-        result[j][i] = sum;
       }
     }
     return result;
