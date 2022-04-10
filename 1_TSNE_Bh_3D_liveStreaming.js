@@ -1,5 +1,5 @@
 let DesiredPerplexity = 7;
-let numberOfIterations = 1;
+let numberOfIterations = 5;
 let LearningRatio = 3;
 let Momentum = 0.3;
 let TradeOff = 0.5;
@@ -7,6 +7,7 @@ let p = [];
 let y = [];
 let oldy = [];
 let numberOfSamplesInX;
+let InversenumberOfSamplesInX;
 let angle = 0;
 let BiggestY = 2;
 let shouldIStartAllOverAgain = true;
@@ -51,6 +52,7 @@ function draw(){
         LearningRatio = LearningRatio * 4; //By definition of dydt ... It doesn't make sense having it inside the loop.
         TradeOff = TradeOff * 1.73; //sqrt of 3. Relationship between de side lenght and the diagonal of the octtree ... It doesn't make sense having it inside the loop.
         numberOfSamplesInX = X.length;
+        InversenumberOfSamplesInX = 1/numberOfSamplesInX;
         let numberOfDimentions = X[1].length;
         let top1 = Array(numberOfSamplesInX).fill(0);
         let top2 = Array(numberOfSamplesInX).fill(0);
@@ -91,7 +93,7 @@ function draw(){
             if(IShouldStay){iter = 101};
         }
         for(let i = 0; i < numberOfSamplesInX; i++){
-            middle1[i] = (top1[i] + bottom1[i]) / 2;
+            middle1[i] = (top1[i] + bottom1[i]) * 0.5;
         }
         p = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, middle1);
         middle2 = GetMeThePerplexity(p, numberOfSamplesInX);
@@ -102,11 +104,11 @@ function draw(){
                 }else if(middle2[i] > DesiredPerplexity){
                     top1[i] = middle1[i];
                     top2[i] = middle2[i];
-                    middle1[i] = (top1[i] + bottom1[i]) / 2;
+                    middle1[i] = (top1[i] + bottom1[i])*0.5;
                 }else{
                     bottom1[i] = middle1[i];
                     bottom2[i] = middle2[i];
-                    middle1[i] = (top1[i] + bottom1[i]) / 2;
+                    middle1[i] = (top1[i] + bottom1[i])*0.5;
                 }
             }
             p = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, middle1);
@@ -121,7 +123,7 @@ function draw(){
                 if(j != i){
                     for(let k = 0; k < VantagePointQueryArray[j].length; k++){
                         if(VantagePointQueryArray[j][k]==i){
-                            p2[i][z] = (p[i][z] + p[j][k]) / (numberOfSamplesInX);
+                            p2[i][z] = (p[i][z] + p[j][k])*InversenumberOfSamplesInX;
                             k = VantagePointQueryArray[j].length;
                         }
                     }
@@ -232,7 +234,7 @@ function getMeThePairWiseAffinities1(X, numberOfSamplesInX, numberOfDimentions){
             if(j != i){
                 for(n = 0; n < numberOfDimentions; n++){
                     aux = X[i][n] - X[j][n];
-                    p[i][z] = p[i][z] + aux * aux;
+                    p[i][z] += aux * aux;
                 }
             }
         }
@@ -409,11 +411,10 @@ function matmul(a, b) {
     for (let j = 0; j < rowsA; j++){
       result[j] = [];
       for (let i = 0; i < 1; i++){
-        let sum = 0;
+        result[j][i] = 0;
         for (let n = 0; n < 3; n++){
-          sum += a[j][n] * b[n];
+            result[j][i] += a[j][n] * b[n];
         }
-        result[j][i] = sum;
       }
     }
     return result;
