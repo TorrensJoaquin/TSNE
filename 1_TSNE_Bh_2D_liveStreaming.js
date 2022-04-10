@@ -232,7 +232,7 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
         let Fattr = zeros(numberOfSamplesInX,2);
         let Frep = zeros(numberOfSamplesInX,2);
         let Sumq = 0;
-        QuadTree = new QuadtreeElement([0,0,0], BiggestY);
+        QuadTree = new QuadtreeElement([0,0], BiggestY);
         QuadTree.InsertInBoxes(y, IndexElements);
         BiggestY = 0;
         if (EarlyExaggeration.DidIFinish){
