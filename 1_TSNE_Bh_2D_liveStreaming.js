@@ -1,3 +1,4 @@
+let numberOfIterations = 5;
 let DesiredPerplexity = 8;
 let LearningRatio = 3;
 let Momentum = 0.3;
@@ -118,7 +119,7 @@ function draw(){
         shouldIStartReInitializeY = false;
         shouldIStartAllOverAgain = false;
     }
-    YUpload(p, y, oldy, numberOfSamplesInX, 1, Momentum, LearningRatio, VantagePointQueryArray, TradeOff);
+    YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, LearningRatio, VantagePointQueryArray, TradeOff);
     strokeWeight(5);
     noFill();
     if (ColorMode == 0){
