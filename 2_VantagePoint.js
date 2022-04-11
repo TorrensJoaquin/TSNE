@@ -1,6 +1,6 @@
 let VantagePointElementCapacity = 1;
 let VantagePointMaximumInception =18;
-let VantagePointQueryArray = Array(31).fill(0);
+let VantagePointQueryArray = [];
 let ResultOfTheQueryVP = [];
 let numberOfDimentions;
 class VantagePointElement{
@@ -43,7 +43,8 @@ class VantagePointElement{
         //Measure my distance
         this.DistanceToTheSample = 0;
         for(let i=0; i < numberOfDimentions; i++){
-            this.DistanceToTheSample = this.DistanceToTheSample + Math.pow(DataBase[this.IndexOfSeed][i]-DataBase[Sample][i],2);
+            let aux1 = DataBase[this.IndexOfSeed][i]-DataBase[Sample][i];
+            this.DistanceToTheSample += aux1 * aux1;
         }
         this.DistanceToTheSample = Math.sqrt(this.DistanceToTheSample);
         //If i am far away
@@ -104,16 +105,17 @@ class VantagePointElement{
             aux = Array(this.AmountOfElementsInMe).fill(0);
             for(let Sample = 0; Sample < this.AmountOfElementsInMe; Sample++){
                 for(let i=0; i < numberOfDimentions; i++){
-                    aux[Sample] = aux[Sample] + Math.pow(DataBase[this.IndexOfSeed][i]-DataBase[IndexOfElementsToEvaluate[Sample]][i],2);
+                    let aux1 = DataBase[this.IndexOfSeed][i]-DataBase[IndexOfElementsToEvaluate[Sample]][i];
+                    aux[Sample] += aux1 * aux1;
                 }
                 aux[Sample] = Math.sqrt(aux[Sample]);
                 if(aux[Sample] < MiddleMu){
-                    CounterOfElementsInsideMe = CounterOfElementsInsideMe + 1;
+                    CounterOfElementsInsideMe += 1;
                 }
             }
             if(CounterOfElementsInsideMe > TargetOfElementsInsideMe){
                 TopMu = MiddleMu;
-                MiddleMu = MiddleMu / 2;
+                MiddleMu = MiddleMu*0.5;
             }else if(CounterOfElementsInsideMe < TargetOfElementsInsideMe){
                 BottomMu = MiddleMu;
                 MiddleMu = (MiddleMu + 0.5) * 2;
@@ -122,7 +124,8 @@ class VantagePointElement{
         aux = Array(this.AmountOfElementsInMe).fill(0);
         for(let Sample = 0; Sample < this.AmountOfElementsInMe; Sample++){
             for(let i=0; i < numberOfDimentions; i++){
-                aux[Sample] = aux[Sample] + Math.pow(DataBase[this.IndexOfSeed][i]-DataBase[IndexOfElementsToEvaluate[Sample]][i],2);
+                let aux1 = DataBase[this.IndexOfSeed][i]-DataBase[IndexOfElementsToEvaluate[Sample]][i];
+                aux[Sample] += aux1 * aux1;
             }
             aux[Sample] = Math.sqrt(aux[Sample]);
         }
@@ -135,17 +138,17 @@ class VantagePointElement{
                     NonDefinitiveListOfIndexOutsideMe.push(IndexOfElementsToEvaluate[Sample]);
                 }else{
                     NonDefinitiveListOfIndexInsideMe.push(IndexOfElementsToEvaluate[Sample]);
-                    CounterOfElementsInsideMe = CounterOfElementsInsideMe + 1;
+                    CounterOfElementsInsideMe += 1;
                 }
             }
             if (CounterOfElementsInsideMe == TargetOfElementsInsideMe){
                 iter = ToleranceOfIteration;
             }else if(CounterOfElementsInsideMe > TargetOfElementsInsideMe){
                 TopMu = MiddleMu;
-                MiddleMu = (TopMu + BottomMu)/2;
+                MiddleMu = (TopMu + BottomMu)*0.5;
             }else{
                 BottomMu = MiddleMu; 
-                MiddleMu = (TopMu + BottomMu)/2;
+                MiddleMu = (TopMu + BottomMu)*0.5;
             }
         }
         this.ListOfIndexElementsInsideMe = NonDefinitiveListOfIndexInsideMe;
@@ -156,13 +159,13 @@ class VantagePointElement{
             this.InsideVantagePointSon = new VantagePointElement();
             this.InsideVantagePointSon.level = this.level + 1;
             this.InsideVantagePointSon.SelectASeedAndFindMu(DataBase, this.ListOfIndexElementsInsideMe);
-            this.ListOfIndexElementsInsideMe = []; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
+            delete this.ListOfIndexElementsInsideMe; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
         }
         if(this.ListOfIndexElementsOutsideMe.length > VantagePointElementCapacity && this.level < VantagePointMaximumInception){
             this.OutsideVantagePointSon = new VantagePointElement();
             this.OutsideVantagePointSon.level = this.level + 1;
             this.OutsideVantagePointSon.SelectASeedAndFindMu(DataBase, this.ListOfIndexElementsOutsideMe);
-            this.ListOfIndexElementsOutsideMe = []; //This is recommended to aliviate memory. but is not mandatory Specially if you are looking for an error;    
+            delete this.ListOfIndexElementsOutsideMe; //This is recommended to aliviate memory. but is not mandatory Specially if you are looking for an error;    
         }
     }
 }
