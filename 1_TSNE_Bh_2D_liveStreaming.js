@@ -6,6 +6,7 @@ let p = [];
 let y = [];
 let oldy = [];
 let numberOfSamplesInX;
+let InversenumberOfSamplesInX;
 let BiggestY = 2;
 let shouldIStartAllOverAgain = true;
 let shouldIStartReInitializeY = true;
@@ -27,9 +28,10 @@ function setup() {
 function draw(){
     background(0);
     if (shouldIStartAllOverAgain == true){
-        LearningRatio = LearningRatio * 4; //By definition of dydt ... It doesn't make sense having it inside the loop.
-        TradeOff = TradeOff * 1.73; //sqrt of 3. Relationship between de side lenght and the diagonal of the octtree ... It doesn't make sense having it inside the loop.
+        LearningRatio *= 4; //By definition of dydt ... It doesn't make sense having it inside the loop.
+        TradeOff *= 1.73; //sqrt of 3. Relationship between de side lenght and the diagonal of the octtree ... It doesn't make sense having it inside the loop.
         numberOfSamplesInX = X.length;
+        InversenumberOfSamplesInX = 1/numberOfSamplesInX;
         let numberOfDimentions = X[1].length;
         let top1 = Array(numberOfSamplesInX).fill(0);
         let top2 = Array(numberOfSamplesInX).fill(0);
@@ -54,10 +56,9 @@ function draw(){
             top1[i] = -0.0001;
             bottom1[i] = -0.0001;
         }
-        let IShouldStay;
+        let IShouldStay = true;
         aux = getMeThePairWiseAffinities1(X, numberOfSamplesInX, numberOfDimentions);
         for(let iter = 0; iter <= 100; iter++){
-            IShouldStay = true;
             p = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, top1);
             top2 = GetMeThePerplexity(p, numberOfSamplesInX);
             for(let i = 0; i < numberOfSamplesInX; i++){
@@ -70,7 +71,7 @@ function draw(){
             if(IShouldStay){iter = 101};
         }
         for(let i = 0; i < numberOfSamplesInX; i++){
-            middle1[i] = (top1[i] + bottom1[i]) / 2;
+            middle1[i] = (top1[i] + bottom1[i]) * 0.5;
         }
         p = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, middle1);
         middle2 = GetMeThePerplexity(p, numberOfSamplesInX);
@@ -81,11 +82,11 @@ function draw(){
                 }else if(middle2[i] > DesiredPerplexity){
                     top1[i] = middle1[i];
                     top2[i] = middle2[i];
-                    middle1[i] = (top1[i] + bottom1[i]) / 2;
+                    middle1[i] = (top1[i] + bottom1[i]) * 0.5;
                 }else{
                     bottom1[i] = middle1[i];
                     bottom2[i] = middle2[i];
-                    middle1[i] = (top1[i] + bottom1[i]) / 2;
+                    middle1[i] = (top1[i] + bottom1[i]) * 0.5;
                 }
             }
             p = getMeThePairWiseAffinities2(aux, numberOfSamplesInX, middle1);
@@ -100,7 +101,7 @@ function draw(){
                 if(j != i){
                     for(let k = 0; k < VantagePointQueryArray[j].length; k++){
                         if(VantagePointQueryArray[j][k]==i){
-                            p2[i][z] = (p[i][z] + p[j][k]) / (numberOfSamplesInX);
+                            p2[i][z] = (p[i][z] + p[j][k]) * InversenumberOfSamplesInX;
                             k = VantagePointQueryArray[j].length;
                         }
                     }
@@ -170,7 +171,8 @@ function getMeThePairWiseAffinities1(X, numberOfSamplesInX, numberOfDimentions){
             j = VantagePointQueryArray[i][z];
             if(j != i){
                 for(let n = 0; n < numberOfDimentions; n++){
-                    p[i][z] = p[i][z] + Math.pow(X[i][n] - X[j][n], 2);
+                    aux = X[i][n] - X[j][n];
+                    p[i][z] += aux * aux;
                 }
             }
         }
@@ -178,7 +180,7 @@ function getMeThePairWiseAffinities1(X, numberOfSamplesInX, numberOfDimentions){
     return p;
 }
 function getMeThePairWiseAffinities2(auxiliar, numberOfSamplesInX, minusTwoSigmaSquared){
-    // get the sum of pair wise affinities and the non normilized pair wise affinities
+    // get the sum of pair wise affinities and the non normalized pair wise affinities
     let sumOfPairWiseAffinities = Array(numberOfSamplesInX).fill(0);
     let p = Array(numberOfSamplesInX).fill(0); //pj|i upper
     for(let i = 0; i < numberOfSamplesInX; i++){
@@ -187,11 +189,11 @@ function getMeThePairWiseAffinities2(auxiliar, numberOfSamplesInX, minusTwoSigma
             j = VantagePointQueryArray[i][z];
             if(j != i){
                 p[i][z] = Math.exp(auxiliar[i][z] / (minusTwoSigmaSquared[i] + 0.000001));
-                sumOfPairWiseAffinities[i] = sumOfPairWiseAffinities[i] + p[i][z];
+                sumOfPairWiseAffinities[i] += p[i][z];
             }
         }
     }
-    // get the normilized pair wise affinities
+    // get the normalized pair wise affinities
     for(let i = 0; i < numberOfSamplesInX; i++){
         for(let z = 0; z < VantagePointQueryArray[i].length; z++){
             j = VantagePointQueryArray[i][z];
@@ -207,10 +209,8 @@ function GetMeThePerplexity(p, numberOfSamplesInX){
     for(i = 0; i < numberOfSamplesInX; i++){
         for(let z = 0; z < VantagePointQueryArray[i].length; z++){
             j = VantagePointQueryArray[i][z];
-            let aux = 0;
             if(j != i){
-                aux = p[i][z] * Math.log2(p[i][z] + 0.001);
-                Perplexities[i] = Perplexities[i] + aux;
+                Perplexities[i] += p[i][z] * Math.log2(p[i][z] + 0.00001);
             }
         }
     }
@@ -241,10 +241,8 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
                     j = VantagePointQueryArray[i][z];
                     if(j != i){
                         aux1=p[i][z] * CalculateZQij( i, j);
-                        aux = aux1 * (y[i][0] - y[j][0]);
-                        Fattr[i][0] = Fattr[i][0] + aux;
-                        aux = aux1 * (y[i][1] - y[j][1]);
-                        Fattr[i][1] = Fattr[i][1] + aux;
+                        Fattr[i][0] += aux1 * (y[i][0] - y[j][0]);
+                        Fattr[i][1] += aux1 * (y[i][1] - y[j][1]);
                     }
                 }
             }
@@ -253,11 +251,9 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
                 for(let z = 0; z < VantagePointQueryArray[i].length; z++){
                     j = VantagePointQueryArray[i][z];
                     if(j != i){
-                        aux1= EarlyExaggeration.Factor * p[i][z] * CalculateZQij( i, j);
-                        aux = aux1 * (y[i][0] - y[j][0]);
-                        Fattr[i][0] = Fattr[i][0] + aux;
-                        aux = aux1 * (y[i][1] - y[j][1]);
-                        Fattr[i][1] = Fattr[i][1] + aux;
+                        aux1 = EarlyExaggeration.Factor * p[i][z] * CalculateZQij( i, j);
+                        Fattr[i][0] += aux1 * (y[i][0] - y[j][0]);
+                        Fattr[i][1] += aux1 * (y[i][1] - y[j][1]);
                     }
                 }
             }
@@ -274,31 +270,27 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
             QuadTree.ListOfEquivalentBodiesOfI(y, i, TradeOff, ResultQT);
             for(let z = 0; z < ResultQT.ResultOfTheQueryQT1.length; z++){
                 aux = CalculateZQij2( i, ResultQT.ResultOfTheQueryQT1[z]);
-                Sumq = Sumq + ResultQT.ResultOfTheQueryQT2[z] / aux;
+                Sumq += ResultQT.ResultOfTheQueryQT2[z] / aux;
                 aux1 = aux * aux;
-                aux = aux1 * (y[i][0] - ResultQT.ResultOfTheQueryQT1[z][0] * ResultQT.ResultOfTheQueryQT2[z])
-                Frep[i][0] = Frep[i][0] - aux;
-                aux = aux1 * (y[i][1] - ResultQT.ResultOfTheQueryQT1[z][1] * ResultQT.ResultOfTheQueryQT2[z])
-                Frep[i][1] = Frep[i][1] - aux;
+                Frep[i][0] -= aux1 * (y[i][0] - ResultQT.ResultOfTheQueryQT1[z][0] * ResultQT.ResultOfTheQueryQT2[z]);
+                Frep[i][1] -= aux1 * (y[i][1] - ResultQT.ResultOfTheQueryQT1[z][1] * ResultQT.ResultOfTheQueryQT2[z]);
             }
             for(let z = 0; z < ResultQT.ResultOfTheQueryQT3.length; z++){
                 aux = CalculateZQij( i, ResultQT.ResultOfTheQueryQT3[z]);
                 Sumq = Sumq +  1 / aux;
-                aux1 = aux * aux;
-                aux = aux1 * (y[i][0] - y[ResultQT.ResultOfTheQueryQT3[z]][0]);
-                Frep[i][0] = Frep[i][0] - aux;
-                aux = aux1 * (y[i][1] - y[ResultQT.ResultOfTheQueryQT3[z]][1]);
-                Frep[i][1] = Frep[i][1] - aux;
+                aux1 = aux * aux; 
+                Frep[i][0] -= aux1 * (y[i][0] - y[ResultQT.ResultOfTheQueryQT3[z]][0]);
+                Frep[i][1] -= aux1 * (y[i][1] - y[ResultQT.ResultOfTheQueryQT3[z]][1]);
             }
         }
         //y adjustment
         for(let i = 0; i < numberOfSamplesInX; i++){
             aux = y[i][0];
-            y[i][0] = y[i][0] - LearningRatio * (Fattr[i][0] + Frep[i][0] / Sumq) + Momentum * (y[i][0] - oldy[i][0]);
+            y[i][0] -= LearningRatio * (Fattr[i][0] + Frep[i][0] / Sumq) + Momentum * (y[i][0] - oldy[i][0]);
             oldy[i][0] = aux;
             if(BiggestY < Math.abs(y[i][0])){BiggestY = Math.abs(y[i][0])}
             aux = y[i][1];
-            y[i][1] = y[i][1] - LearningRatio * (Fattr[i][1] + Frep[i][1] / Sumq) + Momentum * (y[i][1] - oldy[i][1]);
+            y[i][1] -= LearningRatio * (Fattr[i][1] + Frep[i][1] / Sumq) + Momentum * (y[i][1] - oldy[i][1]);
             oldy[i][1] = aux;
             if(BiggestY < Math.abs(y[i][1])){BiggestY = Math.abs(y[i][1])}
         }
@@ -321,7 +313,7 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
         let aux=0;
         aux = aux + Math.abs(y[i][0] - y[j][0]);
         aux = aux + Math.abs(y[i][1] - y[j][1]);
-        return Math.pow(1 + aux, -1);
+        return 1/(1 + aux);
     }
     function CalculateZQij2L1( i, CenterOfMass){
         let aux=0;
