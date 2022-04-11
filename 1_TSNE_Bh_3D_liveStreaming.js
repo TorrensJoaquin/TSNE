@@ -49,8 +49,8 @@ function setup() {
 function draw(){
     background(0);
     if (shouldIStartAllOverAgain == true){
-        LearningRatio = LearningRatio * 4; //By definition of dydt ... It doesn't make sense having it inside the loop.
-        TradeOff = TradeOff * 1.73; //sqrt of 3. Relationship between de side lenght and the diagonal of the octtree ... It doesn't make sense having it inside the loop.
+        LearningRatio *= 4; //By definition of dydt ... It doesn't make sense having it inside the loop.
+        TradeOff *= 1.73; //sqrt of 3. Relationship between de side lenght and the diagonal of the octtree ... It doesn't make sense having it inside the loop.
         numberOfSamplesInX = X.length;
         InversenumberOfSamplesInX = 1/numberOfSamplesInX;
         let numberOfDimentions = X[1].length;
@@ -273,8 +273,8 @@ function GetMeThePerplexity(p, numberOfSamplesInX){
             j = VantagePointQueryArray[i][z];
             let aux = 0;
             if(j != i){
-                aux = p[i][z] * Math.log2(p[i][z] + 0.001);
-                Perplexities[i] = Perplexities[i] + aux;
+                aux = p[i][z] * Math.log2(p[i][z] + 0.00001);
+                Perplexities[i] += aux;
             }
         }
     }
@@ -306,11 +306,11 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
                     if(j != i){
                         aux1=p[i][z] * CalculateZQij( i, j);
                         aux = aux1 * (y[i][0] - y[j][0]);
-                        Fattr[i][0] = Fattr[i][0] + aux;
+                        Fattr[i][0] += aux;
                         aux = aux1 * (y[i][1] - y[j][1]);
-                        Fattr[i][1] = Fattr[i][1] + aux;
+                        Fattr[i][1] += aux;
                         aux = aux1 * (y[i][2] - y[j][2]);
-                        Fattr[i][2] = Fattr[i][2] + aux;
+                        Fattr[i][2] += aux;
                     }
                 }
             }
@@ -321,11 +321,11 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
                     if(j != i){
                         aux1= EarlyExaggeration.Factor * p[i][z] * CalculateZQij( i, j);
                         aux = aux1 * (y[i][0] - y[j][0]);
-                        Fattr[i][0] = Fattr[i][0] + aux;
+                        Fattr[i][0] += aux;
                         aux = aux1 * (y[i][1] - y[j][1]);
-                        Fattr[i][1] = Fattr[i][1] + aux;
+                        Fattr[i][1] += aux;
                         aux = aux1 * (y[i][2] - y[j][2]);
-                        Fattr[i][2] = Fattr[i][2] + aux;
+                        Fattr[i][2] += aux;
                     }
                 }
             }
@@ -335,46 +335,40 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
             strokeWeight(1);
             text('Early Exaggeration Active', 470, 10, 250, 50);
             pop();
-            EarlyExaggeration.Counter = EarlyExaggeration.Counter + 1;
+            EarlyExaggeration.Counter += 1;
             if (EarlyExaggeration.Counter > EarlyExaggeration.Iterations){EarlyExaggeration.DidIFinish = true}
         }
         for(let i = 0; i < numberOfSamplesInX; i++){
             OctTree.ListOfEquivalentBodiesOfI(y, i, TradeOff, ResultOT);
             for(let z = 0; z < ResultOT.ResultOfTheQueryOT1.length; z++){
                 aux = CalculateZQij2( i, ResultOT.ResultOfTheQueryOT1[z]);
-                Sumq = Sumq + ResultOT.ResultOfTheQueryOT2[z] / aux;
+                Sumq += ResultOT.ResultOfTheQueryOT2[z] / aux;
                 aux1 = aux * aux;
-                aux = aux1 * (y[i][0] - ResultOT.ResultOfTheQueryOT1[z][0] * ResultOT.ResultOfTheQueryOT2[z])
-                Frep[i][0] = Frep[i][0] - aux;
-                aux = aux1 * (y[i][1] - ResultOT.ResultOfTheQueryOT1[z][1] * ResultOT.ResultOfTheQueryOT2[z])
-                Frep[i][1] = Frep[i][1] - aux;
-                aux = aux1 * (y[i][2] - ResultOT.ResultOfTheQueryOT1[z][2] * ResultOT.ResultOfTheQueryOT2[z])
-                Frep[i][2] = Frep[i][2] - aux;
+                Frep[i][0] -= aux1 * (y[i][0] - ResultOT.ResultOfTheQueryOT1[z][0] * ResultOT.ResultOfTheQueryOT2[z]);
+                Frep[i][1] -= aux1 * (y[i][1] - ResultOT.ResultOfTheQueryOT1[z][1] * ResultOT.ResultOfTheQueryOT2[z]);
+                Frep[i][2] -= aux1 * (y[i][2] - ResultOT.ResultOfTheQueryOT1[z][2] * ResultOT.ResultOfTheQueryOT2[z]);
             }
             for(let z = 0; z < ResultOT.ResultOfTheQueryOT3.length; z++){
                 aux = CalculateZQij( i, ResultOT.ResultOfTheQueryOT3[z]);
-                Sumq = Sumq +  1 / aux;
+                Sumq +=  1 / aux;
                 aux1 = aux * aux;
-                aux = aux1 * (y[i][0] - y[ResultOT.ResultOfTheQueryOT3[z]][0]);
-                Frep[i][0] = Frep[i][0] - aux;
-                aux = aux1 * (y[i][1] - y[ResultOT.ResultOfTheQueryOT3[z]][1]);
-                Frep[i][1] = Frep[i][1] - aux;
-                aux = aux1 * (y[i][2] - y[ResultOT.ResultOfTheQueryOT3[z]][2]);
-                Frep[i][2] = Frep[i][2] - aux;
+                Frep[i][0] -= aux1 * (y[i][0] - y[ResultOT.ResultOfTheQueryOT3[z]][0]);
+                Frep[i][1] -= aux1 * (y[i][1] - y[ResultOT.ResultOfTheQueryOT3[z]][1]);
+                Frep[i][2] -= aux1 * (y[i][2] - y[ResultOT.ResultOfTheQueryOT3[z]][2]);
             }
         }
         //y adjustment
         for(let i = 0; i < numberOfSamplesInX; i++){
             aux = y[i][0];
-            y[i][0] = y[i][0] - LearningRatio * (Fattr[i][0] + Frep[i][0] / Sumq) + Momentum * (y[i][0] - oldy[i][0]);
+            y[i][0] -= LearningRatio * (Fattr[i][0] + Frep[i][0] / Sumq) + Momentum * (y[i][0] - oldy[i][0]);
             oldy[i][0] = aux;
             if(BiggestY < Math.abs(y[i][0])){BiggestY = Math.abs(y[i][0])}
             aux = y[i][1];
-            y[i][1] = y[i][1] - LearningRatio * (Fattr[i][1] + Frep[i][1] / Sumq) + Momentum * (y[i][1] - oldy[i][1]);
+            y[i][1] -= LearningRatio * (Fattr[i][1] + Frep[i][1] / Sumq) + Momentum * (y[i][1] - oldy[i][1]);
             oldy[i][1] = aux;
             if(BiggestY < Math.abs(y[i][1])){BiggestY = Math.abs(y[i][1])}
             aux = y[i][2];
-            y[i][2] = y[i][2] - LearningRatio * (Fattr[i][2] + Frep[i][2] / Sumq) + Momentum * (y[i][2] - oldy[i][2]);
+            y[i][2] -= LearningRatio * (Fattr[i][2] + Frep[i][2] / Sumq) + Momentum * (y[i][2] - oldy[i][2]);
             oldy[i][2] = aux;
             if(BiggestY < Math.abs(y[i][2])){BiggestY = Math.abs(y[i][2])}
         }
@@ -383,18 +377,18 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
         let aux1 = y[i][0] - y[j][0];
         let aux = aux1 * aux1;
         aux1 = y[i][1] - y[j][1];
-        aux = aux + aux1 * aux1;
+        aux += aux1 * aux1;
         aux1 = y[i][2] - y[j][2];
-        aux = aux + aux1 * aux1;
+        aux += aux1 * aux1;
         return 1 / (1 + aux);
     }
     function CalculateZQij2( i, CenterOfMass){
         let aux1 = y[i][0] - CenterOfMass[0];
         let aux = aux1 * aux1;
         aux1 = y[i][1] - CenterOfMass[1];
-        aux = aux + aux1 * aux1;
+        aux += aux1 * aux1;
         aux1 = y[i][2] - CenterOfMass[2];
-        aux = aux + aux1 * aux1;
+        aux += aux1 * aux1;
         return 1 / (1 + aux);
     }
 }
