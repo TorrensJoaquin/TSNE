@@ -50,9 +50,9 @@ class OctTreeElement{
             let aux1 = DataBase[i][0]-OctTree.CenterOfMass[0];
             let aux = aux1 * aux1;
             aux1 = DataBase[i][1]-OctTree.CenterOfMass[1];
-            aux = aux + aux1 * aux1;
+            aux += aux1 * aux1;
             aux1 = DataBase[i][2]-OctTree.CenterOfMass[2];
-            aux = aux + aux1 * aux1;
+            aux += aux1 * aux1;
             aux = Math.sqrt(aux);
             if(OctTree.Radius / aux < TradeOff){
                 Result.ResultOfTheQueryOT1.push(OctTree.CenterOfMass);
@@ -114,9 +114,9 @@ class OctTreeElement{
         let sumY = 0;
         let sumZ = 0;
         for(let Sample=0; Sample < this.AmountOfElementsInMe; Sample++){
-            sumX = sumX + DataBase[IndexOfElementsToEvaluate[Sample]][0];
-            sumY = sumY + DataBase[IndexOfElementsToEvaluate[Sample]][1];
-            sumZ = sumZ + DataBase[IndexOfElementsToEvaluate[Sample]][2];
+            sumX += DataBase[IndexOfElementsToEvaluate[Sample]][0];
+            sumY += DataBase[IndexOfElementsToEvaluate[Sample]][1];
+            sumZ += DataBase[IndexOfElementsToEvaluate[Sample]][2];
         }
         this.CenterOfMass = [sumX/this.AmountOfElementsInMe, sumY/this.AmountOfElementsInMe, sumZ/this.AmountOfElementsInMe];
     }
@@ -147,67 +147,67 @@ class OctTreeElement{
         }
     }
     SubDivideULB(DataBase){
-        let NewRadius = this.Radius/2;
+        let NewRadius = this.Radius*0.5;
         let NewCenter = [this.Center[0] - NewRadius,this.Center[1] + NewRadius,this.Center[2] - NewRadius];
         this.OctTreeULBSon = new OctTreeElement(NewCenter, NewRadius);
         this.OctTreeULBSon.level = this.level + 1;
         this.OctTreeULBSon.InsertInBoxes(DataBase, this.ListOfIndexElementsULB);
-        this.ListOfIndexElementsULB = []; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
+        delete this.ListOfIndexElementsULB; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
     }
     SubDivideURB(DataBase){
-        let NewRadius = this.Radius/2;
+        let NewRadius = this.Radius*0.5;
         let NewCenter = [this.Center[0] + NewRadius,this.Center[1] + NewRadius,this.Center[2] - NewRadius];
         this.OctTreeURBSon = new OctTreeElement(NewCenter, NewRadius);
         this.OctTreeURBSon.level = this.level + 1;
         this.OctTreeURBSon.InsertInBoxes(DataBase, this.ListOfIndexElementsURB);
-        this.ListOfIndexElementsURB = []; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
+        delete this.ListOfIndexElementsURB; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
     }
     SubDivideDLB(DataBase){
-        let NewRadius = this.Radius/2;
+        let NewRadius = this.Radius*0.5;
         let NewCenter = [this.Center[0] - NewRadius,this.Center[1] - NewRadius,this.Center[2] - NewRadius];
         this.OctTreeDLBSon = new OctTreeElement(NewCenter, NewRadius);
         this.OctTreeDLBSon.level = this.level + 1;
         this.OctTreeDLBSon.InsertInBoxes(DataBase, this.ListOfIndexElementsDLB);
-        this.ListOfIndexElementsDLB = []; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
+        delete this.ListOfIndexElementsDLB; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
     }
     SubDivideDRB(DataBase){
-        let NewRadius = this.Radius/2;
+        let NewRadius = this.Radius*0.5;
         let NewCenter = [this.Center[0] + NewRadius,this.Center[1] - NewRadius,this.Center[2] - NewRadius];
         this.OctTreeDRBSon = new OctTreeElement(NewCenter, NewRadius);
         this.OctTreeDRBSon.level = this.level + 1;
         this.OctTreeDRBSon.InsertInBoxes(DataBase, this.ListOfIndexElementsDRB);
-        this.ListOfIndexElementsDRB = []; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
+        delete this.ListOfIndexElementsDRB; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
     }
     SubDivideULF(DataBase){
-        let NewRadius = this.Radius/2;
+        let NewRadius = this.Radius*0.5;
         let NewCenter = [this.Center[0] - NewRadius,this.Center[1] + NewRadius,this.Center[2] + NewRadius];
         this.OctTreeULFSon = new OctTreeElement(NewCenter, NewRadius);
         this.OctTreeULFSon.level = this.level + 1;
         this.OctTreeULFSon.InsertInBoxes(DataBase, this.ListOfIndexElementsULF);
-        this.ListOfIndexElementsULF = []; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
+        delete this.ListOfIndexElementsULF; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
     }
     SubDivideURF(DataBase){
-        let NewRadius = this.Radius/2;
+        let NewRadius = this.Radius*0.5;
         let NewCenter = [this.Center[0] + NewRadius,this.Center[1] + NewRadius,this.Center[2] + NewRadius];
         this.OctTreeURFSon = new OctTreeElement(NewCenter, NewRadius);
         this.OctTreeURFSon.level = this.level + 1;
         this.OctTreeURFSon.InsertInBoxes(DataBase, this.ListOfIndexElementsURF);
-        this.ListOfIndexElementsURF = []; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
+        delete this.ListOfIndexElementsURF; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
     }
     SubDivideDLF(DataBase){
-        let NewRadius = this.Radius/2;
+        let NewRadius = this.Radius*0.5;
         let NewCenter = [this.Center[0] - NewRadius,this.Center[1] - NewRadius,this.Center[2] + NewRadius];
         this.OctTreeDLFSon = new OctTreeElement(NewCenter, NewRadius);
         this.OctTreeDLFSon.level = this.level + 1;
         this.OctTreeDLFSon.InsertInBoxes(DataBase, this.ListOfIndexElementsDLF);
-        this.ListOfIndexElementsDLF = []; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
+        delete this.ListOfIndexElementsDLF; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
     }
     SubDivideDRF(DataBase){
-        let NewRadius = this.Radius/2;
+        let NewRadius = this.Radius*0.5;
         let NewCenter = [this.Center[0] + NewRadius,this.Center[1] - NewRadius,this.Center[2] + NewRadius];
         this.OctTreeDRFSon = new OctTreeElement(NewCenter, NewRadius);
         this.OctTreeDRFSon.level = this.level + 1;
         this.OctTreeDRFSon.InsertInBoxes(DataBase, this.ListOfIndexElementsDRF);
-        this.ListOfIndexElementsDRF = []; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
+        delete this.ListOfIndexElementsDRF; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
     }
 }
