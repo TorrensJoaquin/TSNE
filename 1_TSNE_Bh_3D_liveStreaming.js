@@ -12,6 +12,9 @@ let angle = 0;
 let BiggestY = 2;
 let shouldIStartAllOverAgain = true;
 let shouldIStartReInitializeY = true;
+let SizeOfCanvas;
+let halfSizeOfCanvas;
+let PositonOfCanvas;
 let ColorMode;
 let EarlyExaggeration ={
     DidIFinish : false,
@@ -42,8 +45,9 @@ function setup() {
     LoadX(Math.floor(Math.random()*3));
     CreateTheInputsBoxes();
     CreateTheInputs();
-    let SizeOfCanvas = [700, 700];
-    let PositonOfCanvas = [100, 425];
+    SizeOfCanvas = [700, 700];
+    halfSizeOfCanvas = [SizeOfCanvas[0]*0.5, SizeOfCanvas[1]*0.5];
+    PositonOfCanvas = [100, 425];
     createCanvas(SizeOfCanvas[0], SizeOfCanvas[1]).position(PositonOfCanvas[0], PositonOfCanvas[1]);
 }
 function draw(){
@@ -156,7 +160,12 @@ function draw(){
     strokeWeight(5);
     noFill();
     let projected = [];
-    let compensation = 300 / BiggestY;
+    let compensation;
+    if(halfSizeOfCanvas[0] > halfSizeOfCanvas[1]){
+        compensation = halfSizeOfCanvas[1] / BiggestY;
+    }else{
+        compensation = halfSizeOfCanvas[0] / BiggestY;    
+    }
     if (ColorMode == 0){
         stroke(255);
         for (let i = 0; i < y.length; i++){
@@ -165,8 +174,8 @@ function draw(){
             rotated = matmul(rotationZ, rotated);
             let projected2d = matmul(projection, rotated);
             projected[i] = [];
-            projected[i][0] = projected2d[0] * compensation + 350;
-            projected[i][1] = projected2d[1] * compensation + 350;
+            projected[i][0] = projected2d[0] * compensation + halfSizeOfCanvas[0];
+            projected[i][1] = projected2d[1] * compensation + halfSizeOfCanvas[1];
             point((projected[i][0]), (projected[i][1]));
         }
     }else if(ColorMode == 1){
@@ -176,8 +185,8 @@ function draw(){
             rotated = matmul(rotationZ, rotated);
             let projected2d = matmul(projection, rotated);
             projected[i] = [];
-            projected[i][0] = projected2d[0] * compensation + 350;
-            projected[i][1] = projected2d[1] * compensation + 350;
+            projected[i][0] = projected2d[0] * compensation + halfSizeOfCanvas[0];
+            projected[i][1] = projected2d[1] * compensation + halfSizeOfCanvas[1];
             stroke(Colors[i]);
             point((projected[i][0]), (projected[i][1]));
         }
@@ -188,13 +197,13 @@ function draw(){
             rotated = matmul(rotationZ, rotated);
             let projected2d = matmul(projection, rotated);
             projected[i] = [];
-            projected[i][0] = projected2d[0] * compensation + 350;
-            projected[i][1] = projected2d[1] * compensation + 350;
+            projected[i][0] = projected2d[0] * compensation + halfSizeOfCanvas[0];
+            projected[i][1] = projected2d[1] * compensation + halfSizeOfCanvas[1];
             stroke(Colors[i][0],Colors[i][1],Colors[i][2]);
             point((projected[i][0]), (projected[i][1]));
         }
     }
-    if (mouseX > 0 && mouseX < 700 && mouseY > 0 && mouseY < 700){
+    if (mouseX > 0 && mouseX < SizeOfCanvas[0] && mouseY > 0 && mouseY < SizeOfCanvas[1]){
         let iPressed = null;
         for (let i = 0; i < projected.length; i++) {
             if(Math.abs(projected[i][0] - mouseX) < 5 && Math.abs(projected[i][1] - mouseY) < 5){
@@ -248,8 +257,7 @@ function getMeThePairWiseAffinities2(auxiliar, numberOfSamplesInX, minusTwoSigma
     for(let i = 0; i < numberOfSamplesInX; i++){
         p[i] = Array(VantagePointQueryArray[i].length).fill(0);
         for(let z = 0; z < VantagePointQueryArray[i].length; z++){
-            j = VantagePointQueryArray[i][z];
-            if(j != i){
+            if(VantagePointQueryArray[i][z] != i){
                 p[i][z] = Math.exp(auxiliar[i][z] / (minusTwoSigmaSquared[i] + 0.000001));
                 sumOfPairWiseAffinities[i] += p[i][z];
             }
@@ -270,8 +278,7 @@ function GetMeThePerplexity(p, numberOfSamplesInX){
     let Perplexities=Array(numberOfSamplesInX).fill(0);
     for(i = 0; i < numberOfSamplesInX; i++){
         for(let z = 0; z < VantagePointQueryArray[i].length; z++){
-            j = VantagePointQueryArray[i][z];
-            if(j != i){
+            if(VantagePointQueryArray[i][z] != i){
                 Perplexities[i] += p[i][z] * Math.log2(p[i][z] + 0.00001);
             }
         }
