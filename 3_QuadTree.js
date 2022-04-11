@@ -79,8 +79,8 @@ class QuadtreeElement{
         let sumX = 0;
         let sumY = 0;
         for(let Sample=0; Sample < this.AmountOfElementsInMe; Sample++){
-            sumX = sumX + DataBase[IndexOfElementsToEvaluate[Sample]][0];
-            sumY = sumY + DataBase[IndexOfElementsToEvaluate[Sample]][1];
+            sumX += DataBase[IndexOfElementsToEvaluate[Sample]][0];
+            sumY += DataBase[IndexOfElementsToEvaluate[Sample]][1];
         }
         this.CenterOfMass = [sumX/this.AmountOfElementsInMe, sumY/this.AmountOfElementsInMe];
     }
@@ -99,35 +99,35 @@ class QuadtreeElement{
         }
     }
     SubDivideUL(DataBase){
-        let NewRadius = this.Radius/2;
+        let NewRadius = this.Radius*0.5;
         let NewCenter = [this.Center[0] - NewRadius,this.Center[1] + NewRadius];
         this.QuadtreeULSon = new QuadtreeElement(NewCenter, NewRadius);
         this.QuadtreeULSon.level = this.level + 1;
         this.QuadtreeULSon.InsertInBoxes(DataBase, this.ListOfIndexElementsUL);
-        this.ListOfIndexElementsUL = []; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
+        delete this.ListOfIndexElementsUL; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
     }
     SubDivideUR(DataBase){
-        let NewRadius = this.Radius/2;
+        let NewRadius = this.Radius*0.5;
         let NewCenter = [this.Center[0] + NewRadius,this.Center[1] + NewRadius];
         this.QuadtreeURSon = new QuadtreeElement(NewCenter, NewRadius);
         this.QuadtreeURSon.level = this.level + 1;
         this.QuadtreeURSon.InsertInBoxes(DataBase, this.ListOfIndexElementsUR);
-        this.ListOfIndexElementsUR = []; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
+        delete this.ListOfIndexElementsUR; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
     }
     SubDivideDL(DataBase){
-        let NewRadius = this.Radius/2;
+        let NewRadius = this.Radius*0.5;
         let NewCenter = [this.Center[0] - NewRadius,this.Center[1] - NewRadius];
         this.QuadtreeDLSon = new QuadtreeElement(NewCenter, NewRadius);
         this.QuadtreeDLSon.level = this.level + 1;
         this.QuadtreeDLSon.InsertInBoxes(DataBase, this.ListOfIndexElementsDL);
-        this.ListOfIndexElementsDL = []; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
+        delete this.ListOfIndexElementsDL; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
     }
     SubDivideDR(DataBase){
-        let NewRadius = this.Radius/2;
+        let NewRadius = this.Radius*0.5;
         let NewCenter = [this.Center[0] + NewRadius,this.Center[1] - NewRadius];
         this.QuadtreeDRSon = new QuadtreeElement(NewCenter, NewRadius);
         this.QuadtreeDRSon.level = this.level + 1;
         this.QuadtreeDRSon.InsertInBoxes(DataBase, this.ListOfIndexElementsDR);
-        this.ListOfIndexElementsDR = []; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
+        delete this.ListOfIndexElementsDR; //This is recommended to aliviate memory. but is not mandatory. Specially if you are looking for an error;
     }
 }
