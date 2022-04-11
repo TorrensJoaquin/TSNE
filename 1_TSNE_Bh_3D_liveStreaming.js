@@ -8,13 +8,15 @@ let y = [];
 let oldy = [];
 let numberOfSamplesInX;
 let InversenumberOfSamplesInX;
-let angle = 0;
 let BiggestY = 2;
 let shouldIStartAllOverAgain = true;
 let shouldIStartReInitializeY = true;
-let SizeOfCanvas;
-let halfSizeOfCanvas;
-let PositonOfCanvas;
+let Canvas = {
+    Canvas:undefined,
+    Size:[700,700],
+    Position:[100, 425],
+    HalfSize:undefined
+}
 let ColorMode;
 let EarlyExaggeration ={
     DidIFinish : false,
@@ -22,6 +24,7 @@ let EarlyExaggeration ={
     Iterations : 250,
     Factor : 4,
 }
+let angle = 0;
 let rotationZ = [
     [0, 0, 0],
     [0, 0, 0],
@@ -45,10 +48,9 @@ function setup() {
     LoadX(Math.floor(Math.random()*3));
     CreateTheInputsBoxes();
     CreateTheInputs();
-    SizeOfCanvas = [700, 700];
-    halfSizeOfCanvas = [SizeOfCanvas[0]*0.5, SizeOfCanvas[1]*0.5];
-    PositonOfCanvas = [100, 425];
-    createCanvas(SizeOfCanvas[0], SizeOfCanvas[1]).position(PositonOfCanvas[0], PositonOfCanvas[1]);
+    Canvas.HalfSize = [Canvas.Size[0]*0.5,Canvas.Size[1]*0.5];
+    Canvas.Canvas = createCanvas(Canvas.Size[0], Canvas.Size[1]);
+    Canvas.Canvas.position(Canvas.Position[0], Canvas.Position[1]);
 }
 function draw(){
     background(0);
@@ -161,10 +163,10 @@ function draw(){
     noFill();
     let projected = [];
     let compensation;
-    if(halfSizeOfCanvas[0] > halfSizeOfCanvas[1]){
-        compensation = halfSizeOfCanvas[1] / BiggestY;
+    if(Canvas.HalfSize[0] > Canvas.HalfSize[1]){
+        compensation = Canvas.HalfSize[1] / BiggestY;
     }else{
-        compensation = halfSizeOfCanvas[0] / BiggestY;    
+        compensation = Canvas.HalfSize[0] / BiggestY;    
     }
     if (ColorMode == 0){
         stroke(255);
@@ -174,8 +176,8 @@ function draw(){
             rotated = matmul(rotationZ, rotated);
             let projected2d = matmul(projection, rotated);
             projected[i] = [];
-            projected[i][0] = projected2d[0] * compensation + halfSizeOfCanvas[0];
-            projected[i][1] = projected2d[1] * compensation + halfSizeOfCanvas[1];
+            projected[i][0] = projected2d[0] * compensation + Canvas.HalfSize[0];
+            projected[i][1] = projected2d[1] * compensation + Canvas.HalfSize[1];
             point((projected[i][0]), (projected[i][1]));
         }
     }else if(ColorMode == 1){
@@ -185,8 +187,8 @@ function draw(){
             rotated = matmul(rotationZ, rotated);
             let projected2d = matmul(projection, rotated);
             projected[i] = [];
-            projected[i][0] = projected2d[0] * compensation + halfSizeOfCanvas[0];
-            projected[i][1] = projected2d[1] * compensation + halfSizeOfCanvas[1];
+            projected[i][0] = projected2d[0] * compensation + Canvas.HalfSize[0];
+            projected[i][1] = projected2d[1] * compensation + Canvas.HalfSize[1];
             stroke(Colors[i]);
             point((projected[i][0]), (projected[i][1]));
         }
@@ -197,13 +199,13 @@ function draw(){
             rotated = matmul(rotationZ, rotated);
             let projected2d = matmul(projection, rotated);
             projected[i] = [];
-            projected[i][0] = projected2d[0] * compensation + halfSizeOfCanvas[0];
-            projected[i][1] = projected2d[1] * compensation + halfSizeOfCanvas[1];
+            projected[i][0] = projected2d[0] * compensation + Canvas.HalfSize[0];
+            projected[i][1] = projected2d[1] * compensation + Canvas.HalfSize[1];
             stroke(Colors[i][0],Colors[i][1],Colors[i][2]);
             point((projected[i][0]), (projected[i][1]));
         }
     }
-    if (mouseX > 0 && mouseX < SizeOfCanvas[0] && mouseY > 0 && mouseY < SizeOfCanvas[1]){
+    if (mouseX > 0 && mouseX < Canvas.Size[0] && mouseY > 0 && mouseY < Canvas.Size[1]){
         let iPressed = null;
         for (let i = 0; i < projected.length; i++) {
             if(Math.abs(projected[i][0] - mouseX) < 5 && Math.abs(projected[i][1] - mouseY) < 5){
