@@ -13,22 +13,23 @@ function PerformPCA(A, LowDimension, LowerDimensionalApproximation){
     //Data Normalization
     let mNew = A[0].length;
     let p = A.length;
+    let invp = 1/(p + 1);
     let Average = 0;
     let StandardDeviation = 0;
     for(let j = 0; j < mNew; j++){
         Average = 0;
         for(let i = 0; i < p; i++){
-            Average = Average + A[i][j];
+            Average += A[i][j];
         }
-        Average = Average / (p + 1);
+        Average *= invp;
         StandardDeviation = 0;
         for(let i = 0; i < p; i++){
-            A[i][j] = A[i][j] - Average;
-            StandardDeviation = StandardDeviation + A[i][j] * A[i][j];
+            A[i][j] -= Average;
+            StandardDeviation += A[i][j] * A[i][j];
         }
         StandardDeviation = Math.sqrt(StandardDeviation / p);
         for(let i = 0; i < p; i++){
-            A[i][j] = A[i][j] / StandardDeviation;
+            A[i][j] /= StandardDeviation;
         }
     }
     //Covariance Matrix
@@ -36,9 +37,9 @@ function PerformPCA(A, LowDimension, LowerDimensionalApproximation){
     for(let i = 0; i < mNew; i++){
         for(let j = 0; j < mNew; j ++){
             for(let k = 0; k < p; k++){
-                C[i][j] = C[i][j] + A[k][i] * A[k][j];
+                C[i][j] += A[k][i] * A[k][j];
             }
-            C[i][j] = C[i][j] / p;
+            C[i][j] /= p;
         }
     }
     //PCA
@@ -48,19 +49,19 @@ function PerformPCA(A, LowDimension, LowerDimensionalApproximation){
         for(let j = 0; j < mNew; j++){
             R[j][j] = 0;
             for(let i = 0; i < mNew; i++){
-                R[j][j] = R[j][j] + C[i][j] * C[i][j];
+                R[j][j] += C[i][j] * C[i][j];
             }
             R[j][j] = Math.sqrt(R[j][j]);
             for(let i = 0; i < mNew; i++){
-                C[i][j] = C[i][j] / R[j][j];
+                C[i][j] /= R[j][j];
             }
             for(let k = (j + 1); k < mNew; k++){
                 R[j][k] = 0;
                 for(let i = 0; i < mNew; i++){
-                    R[j][k] = R[j][k] + C[i][j] * C[i][k];
+                    R[j][k] += C[i][j] * C[i][k];
                 }
                 for(let i = 0; i < mNew; i++){
-                    C[i][k] = C[i][k] - C[i][j] * R[j][k];
+                    C[i][k] -= C[i][j] * R[j][k];
                 }
             }
         }
@@ -72,7 +73,7 @@ function PerformPCA(A, LowDimension, LowerDimensionalApproximation){
     for (let i = 0; i < p; i++){
         for(let j = 0; j < mNew; j++){
             for(let k = 0; k <= LowDimension - 1; k++){
-                C[i][k] = C[i][k] + A[i][j] * R[j][k];
+                C[i][k] += A[i][j] * R[j][k];
             }
         }
     }
@@ -111,7 +112,7 @@ function fmMult(A, B){
     for(i = 0; i < m; i++){
         for(j = 0; j < n; j++){
             for(k = 0; k < p; k++){
-                C[i][j] = C[i][j] + A[i][k] * B[k][j];
+                C[i][j] += A[i][k] * B[k][j];
             }
         }
     }
