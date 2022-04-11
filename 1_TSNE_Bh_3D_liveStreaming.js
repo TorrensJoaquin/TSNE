@@ -251,7 +251,7 @@ function getMeThePairWiseAffinities2(auxiliar, numberOfSamplesInX, minusTwoSigma
             j = VantagePointQueryArray[i][z];
             if(j != i){
                 p[i][z] = Math.exp(auxiliar[i][z] / (minusTwoSigmaSquared[i] + 0.000001));
-                sumOfPairWiseAffinities[i] = sumOfPairWiseAffinities[i] + p[i][z];
+                sumOfPairWiseAffinities[i] += p[i][z];
             }
         }
     }
@@ -260,7 +260,7 @@ function getMeThePairWiseAffinities2(auxiliar, numberOfSamplesInX, minusTwoSigma
         for(let z = 0; z < VantagePointQueryArray[i].length; z++){
             j = VantagePointQueryArray[i][z];
             if(j != i){
-                p[i][z] = p[i][z] / (sumOfPairWiseAffinities[j] + 0.000001);            
+                p[i][z] /= sumOfPairWiseAffinities[j] + 0.000001;
             }
         }
     }
@@ -271,10 +271,8 @@ function GetMeThePerplexity(p, numberOfSamplesInX){
     for(i = 0; i < numberOfSamplesInX; i++){
         for(let z = 0; z < VantagePointQueryArray[i].length; z++){
             j = VantagePointQueryArray[i][z];
-            let aux = 0;
             if(j != i){
-                aux = p[i][z] * Math.log2(p[i][z] + 0.00001);
-                Perplexities[i] += aux;
+                Perplexities[i] += p[i][z] * Math.log2(p[i][z] + 0.00001);
             }
         }
     }
@@ -305,12 +303,9 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
                     j = VantagePointQueryArray[i][z];
                     if(j != i){
                         aux1=p[i][z] * CalculateZQij( i, j);
-                        aux = aux1 * (y[i][0] - y[j][0]);
-                        Fattr[i][0] += aux;
-                        aux = aux1 * (y[i][1] - y[j][1]);
-                        Fattr[i][1] += aux;
-                        aux = aux1 * (y[i][2] - y[j][2]);
-                        Fattr[i][2] += aux;
+                        Fattr[i][0] += aux1 * (y[i][0] - y[j][0]);
+                        Fattr[i][1] += aux1 * (y[i][1] - y[j][1]);
+                        Fattr[i][2] += aux1 * (y[i][2] - y[j][2]);
                     }
                 }
             }
@@ -320,12 +315,9 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
                     j = VantagePointQueryArray[i][z];
                     if(j != i){
                         aux1= EarlyExaggeration.Factor * p[i][z] * CalculateZQij( i, j);
-                        aux = aux1 * (y[i][0] - y[j][0]);
-                        Fattr[i][0] += aux;
-                        aux = aux1 * (y[i][1] - y[j][1]);
-                        Fattr[i][1] += aux;
-                        aux = aux1 * (y[i][2] - y[j][2]);
-                        Fattr[i][2] += aux;
+                        Fattr[i][0] += aux1 * (y[i][0] - y[j][0]);
+                        Fattr[i][1] += aux1 * (y[i][1] - y[j][1]);
+                        Fattr[i][2] += aux1 * (y[i][2] - y[j][2]);
                     }
                 }
             }
