@@ -11,7 +11,7 @@ class OctTreeElement{
     constructor(Center, Radius){
         this.Center = Center;
         this.Radius = Radius;
-        this.ListOfIndexElementsULB = [];
+        this.ListOfIndexElementsULB = []; // 1: Up or Down 2: Left or Right 3: Back or Front
         this.ListOfIndexElementsURB = [];
         this.ListOfIndexElementsDLB = [];
         this.ListOfIndexElementsDRB = [];
