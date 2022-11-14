@@ -29,7 +29,6 @@ class OctTreeElement{
         this.OctTreeDRFSon = undefined;
         this.AmountOfElementsInMe = undefined;
         this.CenterOfMass = undefined;
-        this.DistanceToTheSample = undefined;
         this.level = 0;
     }
     ListOfEquivalentBodiesOfI(DataBase, i, TradeOff, Result){

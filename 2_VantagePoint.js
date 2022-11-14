@@ -12,7 +12,6 @@ class VantagePointElement{
         this.InsideVantagePointSon = undefined;
         this.OutsideVantagePointSon = undefined;
         this.AmountOfElementsInMe = undefined;
-        this.DistanceToTheSample = undefined;
         this.level = 0;
     }
     SearchKNeighbors(DataBase, numberOfSamplesInX, DesiredPerplexity){
@@ -41,48 +40,43 @@ class VantagePointElement{
     }
     SearchNeighborOfI(DataBase, Sample, threshold){
         //Measure my distance
-        this.DistanceToTheSample = 0;
+        let DistanceToTheSample = 0;
         for(let i=0; i < numberOfDimentions; i++){
             let aux1 = DataBase[this.IndexOfSeed][i]-DataBase[Sample][i];
-            this.DistanceToTheSample += aux1 * aux1;
+            DistanceToTheSample += aux1 * aux1;
         }
-        this.DistanceToTheSample = Math.sqrt(this.DistanceToTheSample);
+        DistanceToTheSample = Math.sqrt(DistanceToTheSample);
         //If i am far away
-        if(this.DistanceToTheSample > this.Mu + threshold){
-            if(typeof this.OutsideVantagePointSon != 'undefined'){
-                this.OutsideVantagePointSon.SearchNeighborOfI(DataBase, Sample, threshold);
-            }else{
-                for(let i=0; i < this.ListOfIndexElementsOutsideMe.length; i++){
-                    ResultOfTheQueryVP.push(this.ListOfIndexElementsOutsideMe[i]);
-                }
-            }
-        }else if(this.Mu > threshold + this.DistanceToTheSample){
+        if(DistanceToTheSample > this.Mu + threshold){
+            this.SearchOutside(DataBase, Sample, threshold);
+            return;
+        }
+        if(this.Mu > threshold + DistanceToTheSample){
         //If i am very very close
-            if(typeof this.InsideVantagePointSon != 'undefined'){
-                this.InsideVantagePointSon.SearchNeighborOfI(DataBase, Sample, threshold);
-            }else{
-                for(let i=0; i < this.ListOfIndexElementsInsideMe.length; i++){
-                    ResultOfTheQueryVP.push(this.ListOfIndexElementsInsideMe[i]);
-                }
-            }
-        }else{
+            this.SearchInside(DataBase, Sample, threshold);
+            return;
+        }
         //Is in between
-            if(typeof this.OutsideVantagePointSon != 'undefined'){
-                this.OutsideVantagePointSon.SearchNeighborOfI(DataBase, Sample, threshold);
-            }else{
-                for(let i=0; i < this.ListOfIndexElementsOutsideMe.length; i++){
-                    ResultOfTheQueryVP.push(this.ListOfIndexElementsOutsideMe[i]);
-                }
-            }
-            if(typeof this.InsideVantagePointSon != 'undefined'){
-                this.InsideVantagePointSon.SearchNeighborOfI(DataBase, Sample, threshold);
-            }else{
-                for(let i=0; i < this.ListOfIndexElementsInsideMe.length; i++){
-                    ResultOfTheQueryVP.push(this.ListOfIndexElementsInsideMe[i]);
-                }
+        this.SearchOutside(DataBase, Sample, threshold);
+        this.SearchInside(DataBase, Sample, threshold);
+    }
+    SearchOutside(DataBase, Sample, threshold){
+        if(typeof this.OutsideVantagePointSon != 'undefined'){
+            this.OutsideVantagePointSon.SearchNeighborOfI(DataBase, Sample, threshold);
+        }else{
+            for(let i=0; i < this.ListOfIndexElementsOutsideMe.length; i++){
+                ResultOfTheQueryVP.push(this.ListOfIndexElementsOutsideMe[i]);
             }
         }
-        this.DistanceToTheSample = undefined;
+    }
+    SearchInside(DataBase, Sample, threshold){
+        if(typeof this.InsideVantagePointSon != 'undefined'){
+            this.InsideVantagePointSon.SearchNeighborOfI(DataBase, Sample, threshold);
+        }else{
+            for(let i=0; i < this.ListOfIndexElementsInsideMe.length; i++){
+                ResultOfTheQueryVP.push(this.ListOfIndexElementsInsideMe[i]);
+            }
+        }                
     }
     SelectASeedAndFindMu(DataBase, IndexOfElementsToEvaluate){
         numberOfDimentions = DataBase[0].length;
