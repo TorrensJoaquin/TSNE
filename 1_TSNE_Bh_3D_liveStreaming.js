@@ -70,10 +70,7 @@ function draw(){
         let p2 = [];
         let aux;
         //
-        let IndexElements=[];
-        for(let i = 0; i < X.length; i++){
-            IndexElements[i] = i;
-        }
+        let IndexElements=[];for(let i = 0; i < X.length; i++){IndexElements[i] = i}
         let VantagePoint = new VantagePointElement();
         VantagePoint.SelectASeedAndFindMu(X, IndexElements);
         VantagePoint.SearchKNeighbors(X, numberOfSamplesInX, DesiredPerplexity);
@@ -214,11 +211,11 @@ function draw(){
             }
         }
         if (iPressed != null){
-            push();
+            //push();
             stroke(255,0,90);
             strokeWeight(10);
             point(projected[iPressed][0], projected[iPressed][1]);
-            push();
+            //pop();
             textSize(30);
             strokeWeight(1);
             stroke(255);
@@ -330,12 +327,12 @@ function YUpload(p, y, oldy, numberOfSamplesInX, numberOfIterations, Momentum, L
                     }
                 }
             }
-            push();
+            //push();
             stroke(150);
             textSize(20);
             strokeWeight(1);
             text('Early Exaggeration Active', 470, 10, 250, 50);
-            pop();
+            //pop();
             EarlyExaggeration.Counter += 1;
             if (EarlyExaggeration.Counter > EarlyExaggeration.Iterations){EarlyExaggeration.DidIFinish = true}
         }

@@ -1,5 +1,5 @@
 # TSNE_For_Non_ITs  
-## Simple implementation of the TSNE algorithm as a Microsoft Excel Formula in the file.  
+## Easy implementation of the TSNE algorithm as a Microsoft Excel Formula in the file.  
 
 TSNEinExcel.bas  
 

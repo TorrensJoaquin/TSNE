@@ -4,8 +4,7 @@ function PerformPCA(A, LowDimension, LowerDimensionalApproximation){
     //cannot be smaller than the requested size plus two.
     let mOriginal = A[0].length;
     if (mOriginal > LowerDimensionalApproximation){
-        if(mOriginal - LowDimension > 2){
-        }else{
+        if(mOriginal - LowDimension < 2){
             LowerDimensionalApproximation = LowDimension + 2;
         }
         A = PreReduceDimensionality(A, LowerDimensionalApproximation);
@@ -48,21 +47,13 @@ function PerformPCA(A, LowDimension, LowerDimensionalApproximation){
         C = fmMult(R, C);
         for(let j = 0; j < mNew; j++){
             R[j][j] = 0;
-            for(let i = 0; i < mNew; i++){
-                R[j][j] += C[i][j] * C[i][j];
-            }
+            for(let i = 0; i < mNew; i++){R[j][j] += C[i][j] * C[i][j]}
             R[j][j] = Math.sqrt(R[j][j]);
-            for(let i = 0; i < mNew; i++){
-                C[i][j] /= R[j][j];
-            }
+            for(let i = 0; i < mNew; i++){C[i][j] /= R[j][j]}
             for(let k = (j + 1); k < mNew; k++){
                 R[j][k] = 0;
-                for(let i = 0; i < mNew; i++){
-                    R[j][k] += C[i][j] * C[i][k];
-                }
-                for(let i = 0; i < mNew; i++){
-                    C[i][k] -= C[i][j] * R[j][k];
-                }
+                for(let i = 0; i < mNew; i++){R[j][k] += C[i][j] * C[i][k]}
+                for(let i = 0; i < mNew; i++){C[i][k] -= C[i][j] * R[j][k]}
             }
         }
     }
@@ -72,9 +63,7 @@ function PerformPCA(A, LowDimension, LowerDimensionalApproximation){
     C = zeros(p, LowDimension);
     for (let i = 0; i < p; i++){
         for(let j = 0; j < mNew; j++){
-            for(let k = 0; k <= LowDimension - 1; k++){
-                C[i][k] += A[i][j] * R[j][k];
-            }
+            for(let k = 0; k <= LowDimension - 1; k++){C[i][k] += A[i][j] * R[j][k]}
         }
     }
     return C;
@@ -83,11 +72,7 @@ function createIdentity(mRows, nCols){
     let A = zeros(mRows, nCols);
     for(i = 0; i < mRows; i++){
         for(j = 0;j < nCols; j++){
-            if(i == j){
-                A[i][j] = 1;
-            }else{
-                A[i][j] = 0;
-            }
+            if(i == j){A[i][j] = 1}else{A[i][j] = 0}
         }
     }
     return A;
