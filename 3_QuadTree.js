@@ -38,7 +38,7 @@ class QuadtreeElement{
             let aux1 = DataBase[i][0]-QuadTree.CenterOfMass[0]; 
             let aux = aux1 * aux1;
             aux1 = DataBase[i][1]-QuadTree.CenterOfMass[1];
-            aux = aux + aux1 * aux1;
+            aux += aux1 * aux1;
             aux = Math.sqrt(aux);
             if(QuadTree.Radius / aux < TradeOff){
                 Result.ResultOfTheQueryQT1.push(QuadTree.CenterOfMass);
