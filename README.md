@@ -1,5 +1,5 @@
 # TSNE_For_Non_ITs  
-## Easy implementation of the TSNE algorithm as a Microsoft Excel Formula in the file.  
+## Implementation of the TSNE algorithm as a Microsoft Excel Formula in the file.  
 
 TSNEinExcel.bas  
 
@@ -19,8 +19,4 @@ Finally... If you love cars with carburetors, vinyl discs, the movie Casablanca 
 https://torrensjoaquin.github.io/TSNE/PCAversion  
 
 This is an OpenSource, client side, JS (with the help of P5js) implementation where you can paste your data directly from the spreadsheet.  
-I'm not going to be able to see your information. Everything is happening on your computer.  
-
-### Coming Soon  
-TSNE wizard.(Choosing the best parameters for you)  
-PCA for PreReduction of the dimensionality of large datasets.  
+I'm not going to be able to see your information. Everything is happening on your computer.
